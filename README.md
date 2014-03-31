@@ -16,4 +16,4 @@ julia> using Dates # Loads Dates code into current julia session
 ```
 
 
-* Checkout the updated [Dates manual](https://github.com/karbarcca/Datetime.jl/wiki/Dates-module:-dev-branch)
+* Checkout the updated [Dates manual](https://github.com/karbarcca/Dates.jl/wiki/Dates-Documentation)
