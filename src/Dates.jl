@@ -1,8 +1,7 @@
 module Dates
 
 import Base: hash, isless, isequal, isfinite, convert, precision,
-             typemax, typemin, zero, one, string, show,
-             step, next, colon, last, +, -, *, /, div
+             typemax, typemin, zero, one, string, show, mod, div
 
 export Calendar, ISOCalendar,
     Date, DateTime, UTDateTime,
@@ -23,7 +22,6 @@ export Calendar, ISOCalendar,
     Jan,Feb,Mar,Apr,Jun,Jul,Aug,Sep,Oct,Nov,Dec
 
 include("types.jl")
-include("ratadie_algorithms.jl")
 include("accessors.jl")
 include("conversions_arithmetic.jl")
 include("io.jl")
