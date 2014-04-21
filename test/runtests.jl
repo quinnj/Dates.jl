@@ -1,21 +1,25 @@
 using Dates
-using Base.Test  
+using Base.Test
 
 # Date internal algorithms
 @test Dates.totaldays(0,2,28) == -307
 @test Dates.totaldays(0,2,29) == -306
 @test Dates.totaldays(0,3,1) == -305
 @test Dates.totaldays(0,12,31) == 0
+# Rata Die Days # start from 0001-01-01
 @test Dates.totaldays(1,1,1) == 1
 @test Dates.totaldays(1,1,2) == 2
 @test Dates.totaldays(2013,1,1) == 734869
-
+# _day2date is the opposite of totaldays
+# taking Rata Die Day # and returning proleptic Gregorian date
 @test Dates._day2date(-306) == (0,2,29)
 @test Dates._day2date(-305) == (0,3,1)
 @test Dates._day2date(-2) == (0,12,29)
 @test Dates._day2date(-1) == (0,12,30)
 @test Dates._day2date(0) == (0,12,31)
 @test Dates._day2date(1) == (1,1,1)
+# _year, _month, and _day return the indivial components
+# of _day2date, avoiding additional calculations when possible
 @test Dates._year(-1) == 0
 @test Dates._month(-1) == 12
 @test Dates._day(-1) == 30
@@ -30,6 +34,10 @@ using Base.Test
 @test Dates._month(730120) == 1
 @test Dates._day(730120) == 1
 
+# Test totaldays and _day2date from January 1st of "from" to December 31st of "to"
+# test_dates(-10000,10000) takes about 15 seconds
+# test_dates(year(typemin(Date)),year(typemax(Date))) is full range
+# and would take.......a really long time
 function test_dates(from,to)
     y = m = d = 0
     test_day = Dates.totaldays(from,1,1)
@@ -44,9 +52,11 @@ function test_dates(from,to)
         end
     end
 end
-test_dates(-2000,2000)
+@time test_dates(-2000,2000)
 
+# Create "test" check manually
 test = Dates.DateTime{Dates.UTInstant{Dates.Millisecond},Dates.ISOCalendar}(Dates.UTInst(63492681600000))
+# Test DateTime construction by parts
 @test Dates.DateTime(2013) == test
 @test Dates.DateTime(2013,1) == test
 @test Dates.DateTime(2013,1,1) == test
@@ -55,9 +65,11 @@ test = Dates.DateTime{Dates.UTInstant{Dates.Millisecond},Dates.ISOCalendar}(Date
 @test Dates.DateTime(2013,1,1,0,0,0) == test
 @test Dates.DateTime(2013,1,1,0,0,0,0) == test
 test = Dates.Date(Dates.Day(734869))
+# Test Date construction by parts
 @test Dates.Date(2013) == test
 @test Dates.Date(2013,1) == test
 @test Dates.Date(2013,1,1) == test
+# Test string/show representation of Date
 @test string(Dates.Date(1,1,1)) == "0001-01-01" # January 1st, 1 AD/CE
 @test string(Dates.Date(0,12,31)) == "0000-12-31" # December 31, 1 BC/BCE
 @test Dates.Date(1,1,1) - Dates.Date(0,12,31) == Dates.Day(1)
@@ -86,12 +98,13 @@ test = Date(1,1,1)
 @test Date(false,true,false) == test - Dates.Year(1) - Dates.Day(1)
 @test Date(false,true,true) == test - Dates.Year(1)
 @test Date(true,true,false) == test - Dates.Day(1)
-@test_throws Date(BigFloat(1),BigFloat(1),BigFloat(1))
-@test_throws Date(complex(1),complex(1),complex(1))
-@test_throws Date(float64(1),float64(1),float64(1))
-@test_throws Date(float32(1),float32(1),float32(1))
-@test_throws Date(float16(1),float16(1),float16(1))
-@test_throws Date(Rational(1),Rational(1),Rational(1))
+# Unsupported; make user do their own conversions
+@test_throws MethodError Date(BigFloat(1),BigFloat(1),BigFloat(1))
+@test_throws MethodError Date(complex(1),complex(1),complex(1))
+@test_throws MethodError Date(float64(1),float64(1),float64(1))
+@test_throws MethodError Date(float32(1),float32(1),float32(1))
+@test_throws MethodError Date(float16(1),float16(1),float16(1))
+@test_throws MethodError Date(Rational(1),Rational(1),Rational(1))
 
 # Test year, month, day, hour, minute
 function test_dates()
@@ -158,8 +171,8 @@ end
 test_dates(-2000,2000)
 
 # Months must be in range
-@test_throws Dates.DateTime(2013,0,1)
-@test_throws Dates.DateTime(2013,13,1)
+@test_throws ArgumentError Dates.DateTime(2013,0,1)
+@test_throws ArgumentError Dates.DateTime(2013,13,1)
 
 # Days/Hours/Minutes/Seconds/Milliseconds roll back/forward
 @test Dates.DateTime(2013,1,0) == Dates.DateTime(2012,12,31)
@@ -191,6 +204,10 @@ dt = Dates.DateTime(1972,6,30,23,59,59)
 @test dt + Dates.Year(-1) == Dates.DateTime(1971,6,30,23,59,59)
 
 # Wrapping arithemtic for Months
+# This ends up being trickier than expected because
+# the user might do 2014-01-01 + Month(-14)
+# monthwrap figures out the resulting month
+# when adding/subtracting months from a date
 @test Dates.monthwrap(1,-14) == 11
 @test Dates.monthwrap(1,-13) == 12
 @test Dates.monthwrap(1,-12) == 1
@@ -233,6 +250,8 @@ dt = Dates.DateTime(1972,6,30,23,59,59)
 @test Dates.monthwrap(12,12) == 12
 @test Dates.monthwrap(12,13) == 1
 
+# yearwrap figures out the resulting year
+# when adding/subtracting months from a date
 @test Dates.yearwrap(2000,1,-3600) == 1700
 @test Dates.yearwrap(2000,1,-37) == 1996
 @test Dates.yearwrap(2000,1,-36) == 1997
@@ -449,6 +468,24 @@ dt = Dates.Date(1999,12,27)
 @test dt - Dates.Day(1000) == Dates.Date(1997,4,1)
 
 # week function
+# Tests from http://en.wikipedia.org/wiki/ISO_week_date
+@test Dates.week(Dates.Date(2005,1,1)) == 53
+@test Dates.week(Dates.Date(2005,1,2)) == 53
+@test Dates.week(Dates.Date(2005,12,31)) == 52
+@test Dates.week(Dates.Date(2007,1,1)) == 1
+@test Dates.week(Dates.Date(2007,12,30)) == 52
+@test Dates.week(Dates.Date(2007,12,31)) == 1
+@test Dates.week(Dates.Date(2008,1,1)) == 1
+@test Dates.week(Dates.Date(2008,12,28)) == 52
+@test Dates.week(Dates.Date(2008,12,29)) == 1
+@test Dates.week(Dates.Date(2008,12,30)) == 1
+@test Dates.week(Dates.Date(2008,12,31)) == 1
+@test Dates.week(Dates.Date(2009,1,1)) == 1
+@test Dates.week(Dates.Date(2009,12,31)) == 53
+@test Dates.week(Dates.Date(2010,1,1)) == 53
+@test Dates.week(Dates.Date(2010,1,2)) == 53
+@test Dates.week(Dates.Date(2010,1,2)) == 53
+# Tests from http://www.epochconverter.com/date-and-time/weeknumbers-by-year.php?year=1999
 dt = Dates.DateTime(1999,12,27)
 dt1 = Dates.Date(1999,12,27)
 check = (52,52,52,52,52,52,52,1,1,1,1,1,1,1,2,2,2,2,2,2,2)
@@ -458,6 +495,7 @@ for i = 1:21
     dt = dt + Dates.Day(1)
     dt1 = dt1 + Dates.Day(1)
 end
+# Tests from http://www.epochconverter.com/date-and-time/weeknumbers-by-year.php?year=2000
 dt = Dates.DateTime(2000,12,25)
 dt1 = Dates.Date(2000,12,25)
 for i = 1:21
@@ -466,6 +504,7 @@ for i = 1:21
     dt = dt + Dates.Day(1)
     dt1 = dt1 + Dates.Day(1)
 end
+# Test from http://www.epochconverter.com/date-and-time/weeknumbers-by-year.php?year=2030
 dt = Dates.DateTime(2030,12,23)
 dt1 = Dates.Date(2030,12,23)
 for i = 1:21
@@ -474,6 +513,7 @@ for i = 1:21
     dt = dt + Dates.Day(1)
     dt1 = dt1 + Dates.Day(1)
 end
+# Tests from http://www.epochconverter.com/date-and-time/weeknumbers-by-year.php?year=2004
 dt = Dates.DateTime(2004,12,20)
 dt1 = Dates.Date(2004,12,20)
 check = (52,52,52,52,52,52,52,53,53,53,53,53,53,53,1,1,1,1,1,1,1)
@@ -484,6 +524,7 @@ for i = 1:21
     dt1 = dt1 + Dates.Day(1)
 end
 
+# Test DateTime traits
 a = Dates.DateTime(1972,6,30,23,59,59)
 @test Dates.calendar(a) == Dates.ISOCalendar
 @test Dates.precision(a) == Dates.UTInstant{Millisecond}
@@ -493,18 +534,18 @@ a = Dates.DateTime(1972,6,30,23,59,59)
 @test string(typemin(Dates.Date)) == "-252522163911150-01-01"
 
 # Name functions
-jan = Dates.DateTime(2013,1,1)
-feb = Dates.DateTime(2013,2,2)
-mar = Dates.DateTime(2013,3,3)
-apr = Dates.DateTime(2013,4,4)
-may = Dates.DateTime(2013,5,5)
-jun = Dates.DateTime(2013,6,7)
-jul = Dates.DateTime(2013,7,7)
-aug = Dates.DateTime(2013,8,8)
-sep = Dates.DateTime(2013,9,9)
-oct = Dates.DateTime(2013,10,10)
-nov = Dates.DateTime(2013,11,11)
-dec = Dates.DateTime(2013,12,11)
+jan = Dates.DateTime(2013,1,1) #Tuesday
+feb = Dates.DateTime(2013,2,2) #Saturday
+mar = Dates.DateTime(2013,3,3) #Sunday
+apr = Dates.DateTime(2013,4,4) #Thursday
+may = Dates.DateTime(2013,5,5) #Sunday
+jun = Dates.DateTime(2013,6,7) #Friday
+jul = Dates.DateTime(2013,7,7) #Sunday
+aug = Dates.DateTime(2013,8,8) #Thursday
+sep = Dates.DateTime(2013,9,9) #Monday
+oct = Dates.DateTime(2013,10,10) #Thursday
+nov = Dates.DateTime(2013,11,11) #Monday
+dec = Dates.DateTime(2013,12,11) #Wednesday
 monthnames = ["January","February","March","April",
                 "May","June","July","August","September",
                 "October","November","December"]
@@ -546,14 +587,18 @@ end
 @test Dates.isleap(Dates.DateTime(4)) == true
 @test Dates.isleap(Dates.DateTime(-4)) == true
 
-@test Dates.dayofweek(Dates.DateTime(2013,12,22)) == 0
+# Days of week from Monday = 1 to Sunday = 7
+@test Dates.dayofweek(Dates.DateTime(2013,12,22)) == 7
 @test Dates.dayofweek(Dates.DateTime(2013,12,23)) == 1
 @test Dates.dayofweek(Dates.DateTime(2013,12,24)) == 2
 @test Dates.dayofweek(Dates.DateTime(2013,12,25)) == 3
 @test Dates.dayofweek(Dates.DateTime(2013,12,26)) == 4
 @test Dates.dayofweek(Dates.DateTime(2013,12,27)) == 5
 @test Dates.dayofweek(Dates.DateTime(2013,12,28)) == 6
-@test Dates.dayofweek(Dates.DateTime(2013,12,29)) == 0
+@test Dates.dayofweek(Dates.DateTime(2013,12,29)) == 7
+
+# There are 5 Sundays in December, 2013
+@test Dates.daysofweekinmonth(Dates.DateTime(2013,12,1)) == 5
 
 @test Dates.dayofweekofmonth(Dates.DateTime(2013,12,1)) == 1
 @test Dates.dayofweekofmonth(Dates.DateTime(2013,12,8)) == 2
@@ -561,13 +606,14 @@ end
 @test Dates.dayofweekofmonth(Dates.DateTime(2013,12,22)) == 4
 @test Dates.dayofweekofmonth(Dates.DateTime(2013,12,29)) == 5
 
-@test Dates.daysofweekinmonth(Dates.DateTime(2013,12,1)) == 5
-
 @test Dates.dayofyear(Dates.DateTime(2000,1,1)) == 1
 @test Dates.dayofyear(Dates.DateTime(2004,1,1)) == 1
 @test Dates.dayofyear(Dates.DateTime(20013,1,1)) == 1
+# Leap year
 @test Dates.dayofyear(Dates.DateTime(2000,12,31)) == 366
+# Non-leap year
 @test Dates.dayofyear(Dates.DateTime(2001,12,31)) == 365
+# Test every day of a year
 dt = Dates.DateTime(2000,1,1)
 for i = 1:366
     @test Dates.dayofyear(dt) == i
@@ -579,13 +625,34 @@ for i = 1:365
     dt += Dates.Day(1)
 end
 
-a = Dates.Date(2014,1,5)
-b = Dates.Date(2014,1,6)
-c = Dates.Date(2014,1,7)
-d = Dates.Date(2014,1,8)
-e = Dates.Date(2014,1,9)
-f = Dates.Date(2014,1,10)
-g = Dates.Date(2014,1,11)
+# Test first day of week; 2014-01-06 is a Monday = 1st day of week
+a = Dates.Date(2014,1,6)
+b = Dates.Date(2014,1,7)
+c = Dates.Date(2014,1,8)
+d = Dates.Date(2014,1,9)
+e = Dates.Date(2014,1,10)
+f = Dates.Date(2014,1,11)
+g = Dates.Date(2014,1,12)
+@test Dates.firstdayofweek(a) == a
+@test Dates.firstdayofweek(b) == a
+@test Dates.firstdayofweek(c) == a
+@test Dates.firstdayofweek(d) == a
+@test Dates.firstdayofweek(e) == a
+@test Dates.firstdayofweek(f) == a
+@test Dates.firstdayofweek(g) == a
+# Test firstdayofweek over the course of the year
+dt = a
+for i = 0:364
+    @test Dates.firstdayofweek(dt) == a + Dates.Week(div(i,7))
+    dt += Dates.Day(1)
+end
+a = Dates.DateTime(2014,1,6)
+b = Dates.DateTime(2014,1,7)
+c = Dates.DateTime(2014,1,8)
+d = Dates.DateTime(2014,1,9)
+e = Dates.DateTime(2014,1,10)
+f = Dates.DateTime(2014,1,11)
+g = Dates.DateTime(2014,1,12)
 @test Dates.firstdayofweek(a) == a
 @test Dates.firstdayofweek(b) == a
 @test Dates.firstdayofweek(c) == a
@@ -598,33 +665,16 @@ for i = 0:364
     @test Dates.firstdayofweek(dt) == a + Dates.Week(div(i,7))
     dt += Dates.Day(1)
 end
-a = Dates.DateTime(2014,1,5)
-b = Dates.DateTime(2014,1,6)
-c = Dates.DateTime(2014,1,7)
-d = Dates.DateTime(2014,1,8)
-e = Dates.DateTime(2014,1,9)
-f = Dates.DateTime(2014,1,10)
-g = Dates.DateTime(2014,1,11)
-@test Dates.firstdayofweek(a) == a
-@test Dates.firstdayofweek(b) == a
-@test Dates.firstdayofweek(c) == a
-@test Dates.firstdayofweek(d) == a
-@test Dates.firstdayofweek(e) == a
-@test Dates.firstdayofweek(f) == a
-@test Dates.firstdayofweek(g) == a
-dt = a
-for i = 0:364
-    @test Dates.firstdayofweek(dt) == a + Dates.Week(div(i,7))
-    dt += Dates.Day(1)
-end
-@test Dates.firstdayofweek(Dates.DateTime(2013,12,24)) == Dates.DateTime(2013,12,22)
-a = Dates.Date(2014,1,5)
-b = Dates.Date(2014,1,6)
-c = Dates.Date(2014,1,7)
-d = Dates.Date(2014,1,8)
-e = Dates.Date(2014,1,9)
-f = Dates.Date(2014,1,10)
-g = Dates.Date(2014,1,11)
+@test Dates.firstdayofweek(Dates.DateTime(2013,12,24)) == Dates.DateTime(2013,12,23)
+# Test last day of week; Sunday = last day of week
+# 2014-01-12 is a Sunday
+a = Dates.Date(2014,1,6)
+b = Dates.Date(2014,1,7)
+c = Dates.Date(2014,1,8)
+d = Dates.Date(2014,1,9)
+e = Dates.Date(2014,1,10)
+f = Dates.Date(2014,1,11)
+g = Dates.Date(2014,1,12)
 @test Dates.lastdayofweek(a) == g
 @test Dates.lastdayofweek(b) == g
 @test Dates.lastdayofweek(c) == g
@@ -637,13 +687,13 @@ for i = 0:364
     @test Dates.lastdayofweek(dt) == g + Dates.Week(div(i,7))
     dt += Dates.Day(1)
 end
-a = Dates.DateTime(2014,1,5)
-b = Dates.DateTime(2014,1,6)
-c = Dates.DateTime(2014,1,7)
-d = Dates.DateTime(2014,1,8)
-e = Dates.DateTime(2014,1,9)
-f = Dates.DateTime(2014,1,10)
-g = Dates.DateTime(2014,1,11)
+a = Dates.DateTime(2014,1,6)
+b = Dates.DateTime(2014,1,7)
+c = Dates.DateTime(2014,1,8)
+d = Dates.DateTime(2014,1,9)
+e = Dates.DateTime(2014,1,10)
+f = Dates.DateTime(2014,1,11)
+g = Dates.DateTime(2014,1,12)
 @test Dates.lastdayofweek(a) == g
 @test Dates.lastdayofweek(b) == g
 @test Dates.lastdayofweek(c) == g
@@ -656,13 +706,20 @@ for i = 0:364
     @test Dates.lastdayofweek(dt) == g + Dates.Week(div(i,7))
     dt += Dates.Day(1)
 end
-@test Dates.lastdayofweek(Dates.DateTime(2013,12,24)) == Dates.DateTime(2013,12,28)
+@test Dates.lastdayofweek(Dates.DateTime(2013,12,24)) == Dates.DateTime(2013,12,29)
 
 @test Date(DateTime(Date(2012,7,1))) == Date(2012,7,1)
+# Test conversion to and from unix
 @test Dates.unix2date(Dates.date2unix(DateTime(2000,1,1))) == DateTime(2000,1,1)
 @test Dates.DateTime(1970).instant.t.ms == Dates.UNIXEPOCH
-#@test Dates.date2unix(now()) == time()
+# This test is very sensitive (second-precision)
+# so we need to warmup (i.e. compile) both sides of our equality
+# before running to ensure it passes
+Dates.date2unix(now())
+time()
+@test Dates.date2unix(now()) == time()
 
+# A few simple tests for recur
 startdate = Date(2014,1,1)
 stopdate = Date(2014,2,1)
 januarymondays2014 = [Date(2014,1,6),Date(2014,1,13),Date(2014,1,20),Date(2014,1,27)]
@@ -721,7 +778,7 @@ a2 = "96-1-1"
 a3 = "1996-1-15"
 @test Dates.DateTime(a3,f) == dt
 a4 = "1996-Jan-15"
-@test_throws Dates.DateTime(a4,f) # Trying to use month name, but specified only "mm"
+@test_throws ArgumentError Dates.DateTime(a4,f) # Trying to use month name, but specified only "mm"
 
 f = "yy/mmm/dd"
 b = "96/Feb/15"
@@ -744,7 +801,7 @@ c2 = "96:15:1"
 c3 = "96:1:01"
 @test Dates.DateTime(c3,f) + Dates.Year(1900) + Dates.Day(14) == dt
 c4 = "96:15:01 # random comment"
-@test_throws Dates.DateTime(c4,f) # Currently doesn't handle trailing comments
+@test_throws ArgumentError Dates.DateTime(c4,f) # Currently doesn't handle trailing comments
 
 f = "yyyy,mmm,dd"
 d = "1996,Jan,15"
@@ -797,7 +854,7 @@ f = "yyyy-mm-dd zzz"
 # y = "1996/1"
 # @test Dates.DateTime(y,f) == dt - Dates.Day(14)
 # y1 = "1996/1/15"
-# @test_throws Dates.DateTime(y1,f)
+# @test_throws ArgumentError Dates.DateTime(y1,f)
 # y2 = "96/1"
 # @test Dates.DateTime(y2,f) + Dates.Year(1900) == dt - Dates.Day(14)
 
@@ -831,10 +888,10 @@ f = "yyyy-mm-dd zzz"
 # f = "mmm-yyyy-dd"
 # @test Dates.DateTime(gg,f) == dt
 
-@test_throws DateTime("18/05/2009","mm/dd/yyyy") # switched month and day
-@test_throws DateTime("18/05/2009 16","mm/dd/yyyy hh") # same
+@test_throws ArgumentError DateTime("18/05/2009","mm/dd/yyyy") # switched month and day
+@test_throws ArgumentError DateTime("18/05/2009 16","mm/dd/yyyy hh") # same
 @test DateTime("18/05/2009 16:12","mm/dd/yyyy hh:mm") == DateTime(2009,12,16) # here they used mm instead of MM for minutes
-@test_throws DateTime("18:05:2009","mm/dd/yyyy")
+@test_throws ArgumentError DateTime("18:05:2009","mm/dd/yyyy")
 @test Date("2009年12月01日","yyyy年mm月dd日") == Date(2009,12,1)
 @test Date("2009-12-01","yyyy-mm-dd") == Date(2009,12,1)
 
@@ -851,10 +908,10 @@ f = "yyyy-mm-dd zzz"
 @test div(Dates.Year(10),Dates.Year(4)) == Dates.Year(2)
 t = Dates.Year(1)
 t2 = Dates.Year(2)
-@test ([t,t,t,t,t] + Dates.Year(1)) == ([t2,t2,t2,t2,t2])
-@test ([t2,t2,t2,t2,t2] - Dates.Year(1)) == ([t,t,t,t,t])
-@test ([t,t,t,t,t] * Dates.Year(1)) == ([t,t,t,t,t])
-@test ([t,t,t,t,t] % t2) == ([t,t,t,t,t])
+@test ([t,t,t,t,t] .+ Dates.Year(1)) == ([t2,t2,t2,t2,t2])
+@test ([t2,t2,t2,t2,t2] .- Dates.Year(1)) == ([t,t,t,t,t])
+@test ([t,t,t,t,t] .* Dates.Year(1)) == ([t,t,t,t,t])
+@test ([t,t,t,t,t] .% t2) == ([t,t,t,t,t])
 @test div([t,t,t,t,t],Dates.Year(1)) == ([t,t,t,t,t])
 
 #Period arithmetic
@@ -873,16 +930,16 @@ ms = Dates.Millisecond(1)
 @test Dates.DateTime(y,m,d,h,mi) == Dates.DateTime(1,1,1,1,1)
 @test Dates.DateTime(y,m,d,h,mi,s) == Dates.DateTime(1,1,1,1,1,1)
 @test Dates.DateTime(y,m,d,h,mi,s,ms) == Dates.DateTime(1,1,1,1,1,1,1)
-@test_throws Dates.DateTime(Dates.Day(10),Dates.Month(2),y)
-@test_throws Dates.DateTime(Dates.Second(10),Dates.Month(2),y,Dates.Hour(4))
-@test_throws Dates.DateTime(Dates.Year(1),Dates.Month(2),Dates.Day(1),Dates.Hour(4),Dates.Second(10))
+@test_throws ArgumentError Dates.DateTime(Dates.Day(10),Dates.Month(2),y)
+@test_throws ArgumentError Dates.DateTime(Dates.Second(10),Dates.Month(2),y,Dates.Hour(4))
+@test_throws ArgumentError Dates.DateTime(Dates.Year(1),Dates.Month(2),Dates.Day(1),Dates.Hour(4),Dates.Second(10))
 @test Dates.Date(y) == Dates.Date(1)
 @test Dates.Date(y,m) == Dates.Date(1,1)
 @test Dates.Date(y,m,d) == Dates.Date(1,1,1)
-@test_throws Dates.Date(m)
-@test_throws Dates.Date(d,y)
-@test_throws Dates.Date(d,m)
-@test_throws Dates.Date(m,y)
+@test_throws ArgumentError Dates.Date(m)
+@test_throws ArgumentError Dates.Date(d,y)
+@test_throws ArgumentError Dates.Date(d,m)
+@test_throws ArgumentError Dates.Date(m,y)
 @test Dates.Year(int8(1)) == y
 @test Dates.Year(uint8(1)) == y
 @test Dates.Year(int16(1)) == y
@@ -894,25 +951,25 @@ ms = Dates.Millisecond(1)
 @test Dates.Year(int128(1)) == y
 @test Dates.Year(uint128(1)) == y
 @test Dates.Year(big(1)) == y
-@test_throws Dates.Year(BigFloat(1)) == y
-@test_throws Dates.Year(float(1)) == y
-@test_throws Dates.Year(float32(1)) == y
-@test_throws Dates.Year(float16(1)) == y
-@test_throws Dates.Year(Rational(1)) == y
-@test_throws Dates.Year(complex(1)) == y
+@test_throws MethodError Dates.Year(BigFloat(1)) == y
+@test_throws MethodError Dates.Year(float(1)) == y
+@test_throws MethodError Dates.Year(float32(1)) == y
+@test_throws MethodError Dates.Year(float16(1)) == y
+@test_throws MethodError Dates.Year(Rational(1)) == y
+@test_throws MethodError Dates.Year(complex(1)) == y
 @test Dates.Year(true) == y
 @test Dates.Year(false) != y
 @test Dates.Year('\x01') == y
-@test_throws Dates.Year(:hey) == y
+@test_throws MethodError Dates.Year(:hey) == y
 @test Dates.Year(real(1)) == y
-@test_throws Dates.Year(m) == y
-@test_throws Dates.Year(w) == y
-@test_throws Dates.Year(d) == y
-@test_throws Dates.Year(h) == y
-@test_throws Dates.Year(mi) == y
-@test_throws Dates.Year(s) == y
-@test_throws Dates.Year(ms) == y
-@test_throws Dates.Year(Date(2013,1,1))
+@test_throws MethodError Dates.Year(m) == y
+@test_throws MethodError Dates.Year(w) == y
+@test_throws MethodError Dates.Year(d) == y
+@test_throws MethodError Dates.Year(h) == y
+@test_throws MethodError Dates.Year(mi) == y
+@test_throws MethodError Dates.Year(s) == y
+@test_throws MethodError Dates.Year(ms) == y
+@test_throws MethodError Dates.Year(Date(2013,1,1))
 @test typeof(y+m) <: Dates.CompoundPeriod
 @test typeof(m+y) <: Dates.CompoundPeriod
 @test typeof(y+w) <: Dates.CompoundPeriod
@@ -921,34 +978,45 @@ ms = Dates.Millisecond(1)
 @test typeof(y+mi) <: Dates.CompoundPeriod
 @test typeof(y+s) <: Dates.CompoundPeriod
 @test typeof(y+ms) <: Dates.CompoundPeriod
-@test_throws y > m
-@test_throws d < w
+@test_throws ArgumentError y > m
+@test_throws ArgumentError d < w
 @test typemax(Dates.Year) == Dates.Year(typemax(Int64))
 @test typemax(Dates.Year) + y == Dates.Year(-9223372036854775808)
 @test typemin(Dates.Year) == Dates.Year(-9223372036854775808)
 #Period-Real arithmetic
 @test y + 1 == Dates.Year(2)
 @test 1 + y == Dates.Year(2)
+@test y + true == Dates.Year(2)
+@test true + y == Dates.Year(2)
+@test y + '\x01' == Dates.Year(2)
+@test '\x01' + y == Dates.Year(2)
 @test y + 1.0 == Dates.Year(2)
+@test_throws ArgumentError y + 1.2
+@test y + 1f0 == Dates.Year(2)
+@test_throws ArgumentError y + 1.2f0
+@test y + BigFloat(1) == Dates.Year(2)
+@test_throws ArgumentError y + BigFloat(1.2)
+@test y + 1.0 == Dates.Year(2)
+@test_throws ArgumentError y + 1.2
 @test y * 4 == Dates.Year(4)
 @test y * 4f0 == Dates.Year(4)
-@test y * 3//4 == Dates.Year(1)
+@test_throws ArgumentError y * 3//4 == Dates.Year(1)
 @test div(y,2) == Dates.Year(0)
 @test div(2,y) == Dates.Year(2)
 @test div(y,y) == Dates.Year(1)
 @test y*10 % 5 == Dates.Year(0)
 @test 5 % y*10 == Dates.Year(0)
-@test_throws y > 3
-@test_throws 4 < y
-@test_throws 1 == y
+@test_throws ArgumentError y > 3
+@test_throws ArgumentError 4 < y
+@test_throws ArgumentError 1 == y
 t = [y,y,y,y,y]
 @test t .+ Dates.Year(2) == [Dates.Year(3),Dates.Year(3),Dates.Year(3),Dates.Year(3),Dates.Year(3)]
 dt = Dates.DateTime(2012,12,21)
+# Associativity
 test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test test == dt + y - m + w - d + h - mi + s - ms
 @test test == y - m + w - d + dt + h - mi + s - ms
 @test test == dt - m + y - d + w - mi + h - ms + s
 @test test == dt + (y - m + w - d + h - mi + s - ms)
 @test test == dt + y - m + w - d + (h - mi + s - ms)
-#associative
 @test (dt + Dates.Year(4)) + Dates.Day(1) == dt + (Dates.Year(4) + Dates.Day(1))
