@@ -74,13 +74,13 @@ typealias UTDateTime DateTime{UTInstant{Millisecond},ISOCalendar}
 
 immutable Date <: TimeType
     instant::Day
-    # This is to prevent Date(2013) from auto-converting to
-    # Date(Day(2013))
+    # Custom constructor to prevent Date(2013)
+    # from auto-converting to Date(Day(2013))
     Date(x::Day) = new(x)
 end
 
 # Convert y,m,d to # of Rata Die days
-const MONTHDAYS = [306,337,0,31,61,92,122,153,184,214,245,275]
+const MONTHDAYS = Int64[306,337,0,31,61,92,122,153,184,214,245,275]
 function totaldays(y,m,d)
     z = m < 3 ? y - 1 : y
     mdays = MONTHDAYS[m]::Int64
@@ -95,7 +95,7 @@ function DateTime(y::Integer,m::Integer=1,d::Integer=1,
     return UTDateTime(UTInst(rata))
 end
 
-function Date(y,m=1,d=1)
+function Date(y::Integer,m::Integer=1,d::Integer=1)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
     return Date(Day(totaldays(y,m,d)))
 end
