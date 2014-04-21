@@ -101,15 +101,16 @@ end
 show(io::IO,x::Date) = print(io,string(x))
 
 # Date functions
-const Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday = 1,2,3,4,5,6,0
+#TODO: make these enums
+const Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday = 1,2,3,4,5,6,7
 const January,February,March,April,May,June = 1,2,3,4,5,6
 const July,August,September,October,November,December = 7,8,9,10,11,12
-const Mon,Tue,Wed,Thu,Fri,Sat,Sun = 1,2,3,4,5,6,0
+const Mon,Tue,Wed,Thu,Fri,Sat,Sun = 1,2,3,4,5,6,7
 const Jan,Feb,Mar,Apr,Jun,Jul,Aug,Sep,Oct,Nov,Dec = 1,2,3,4,5,6,7,8,9,10,11,12
 const DAYSOFWEEK = [1=>"Monday",2=>"Tuesday",3=>"Wednesday",
-                    4=>"Thursday",5=>"Friday",6=>"Saturday",0=>"Sunday"]
+                    4=>"Thursday",5=>"Friday",6=>"Saturday",7=>"Sunday"]
 const DAYSOFWEEKABBR = [1=>"Mon",2=>"Tue",3=>"Wed",
-                        4=>"Thu",5=>"Fri",6=>"Sat",0=>"Sun"]
+                        4=>"Thu",5=>"Fri",6=>"Sat",7=>"Sun"]
 const MONTHS = [1=>"January",2=>"February",3=>"March",4=>"April",
                 5=>"May",6=>"June",7=>"July",8=>"August",9=>"September",
                 10=>"October",11=>"November",12=>"December"]
@@ -122,10 +123,10 @@ monthabbr(dt::TimeType) = MONTHSABBR[month(dt)]
 dayname(dt::TimeType) = DAYSOFWEEK[dayofweek(dt)]
 dayabbr(dt::TimeType) = DAYSOFWEEKABBR[dayofweek(dt)]
 
-const DAYSINMONTH = [31,28,31,30,31,30,31,31,30,31,30,31]
+const DAYSINMONTH = Int64[31,28,31,30,31,30,31,31,30,31,30,31]
 _isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
 function _lastdayofmonth(y,m)
-    @inbounds d = DAYSINMONTH[m]
+    d = DAYSINMONTH[m]::Int64
     return d + (m == 2 && _isleap(y))
 end
 isleap(dt::TimeType) = _isleap(year(dt))
@@ -133,7 +134,7 @@ lastdayofmonth(dt::TimeType) = _lastdayofmonth(year(dt),month(dt))
 firstdayofmonth(dt::Date) = Date(year(dt),month(dt),1)
 firstdayofmonth(dt::DateTime) = DateTime(year(dt),month(dt),1)
 # Sunday = 0, Monday = 1....Saturday = 6
-dayofweek(dt::TimeType) = _days(dt) % 7
+dayofweek(dt::TimeType) = (_ = _days(dt) % 7; return _ == 0 ? 7 : _)
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
 dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
     d < 15 ? 2 : d < 22 ? 3 : d < 29 ? 4 : 5)
@@ -145,16 +146,11 @@ function daysofweekinmonth(dt::TimeType)
            ld == 30 ? ((d in [1,2,8,9,15,16,22,23,29,30]) ? 5 : 4) :
            (d in [1,2,3,8,9,10,15,16,17,22,23,24,29,30,31]) ? 5 : 4
 end
-function firstdayofweek(dt::DateTime)
-    d = firstdayofweek(Date(dt))
-    return DateTime(d)
-end
-firstdayofweek(dt::Date) = Date(dt.instant - dayofweek(dt))
-function lastdayofweek(dt::DateTime)
-    d = lastdayofweek(Date(dt))
-    return DateTime(d)
-end
-lastdayofweek(dt::Date) = Date(dt.instant + (6-dayofweek(dt)))
+
+firstdayofweek(dt::Date) = Date(dt.instant - dayofweek(dt) + Day(1))
+firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
+lastdayofweek(dt::Date) = Date(dt.instant + (7-dayofweek(dt)))
+lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
 dayofyear(dt::TimeType) = _days(dt) - totaldays(year(dt),1,1) + 1
 
 @vectorize_1arg TimeType isleap
