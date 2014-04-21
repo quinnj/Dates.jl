@@ -1,12 +1,6 @@
 #Period types
-value(x::Year)          = x.years
-value(x::Month)         = x.months
-value(x::Week)          = x.weeks
-value(x::Day)           = x.days
-value(x::Hour)          = x.h
-value(x::Minute)        = x.m
-value(x::Second)        = x.s
-value(x::Millisecond)   = x.ms
+value{P<:Period}(x::P) = x.value
+
 for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
     @eval $p(x::$p) = x
 end
@@ -102,15 +96,15 @@ show(io::IO,x::CompoundPeriod) = print(io,string(x))
 function DateTime(y::Year=Year(1),m::Month=Month(1),d::Day=Day(1),
                   h::Hour=Hour(0),mi::Minute=Minute(0),
                   s::Second=Second(0),ms::Millisecond=Millisecond(0))
-    0 < m.months < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
-    rata = ms + 1000*(s.s + 60mi.m + 3600h.h + 
-                         86400*totaldays(y.years,m.months,d.days))
-    return UTDateTime(UTInst(rata))
+    0 < value(m) < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
+    rata = ms + 1000*(value(s) + 60*value(mi) + 3600*value(h) + 
+                         86400*totaldays(value(y),value(m),value(d)))
+    return UTDateTime(UTM(rata))
 end
 DateTime(x::Period...) = throw(ArgumentError("Required argument order is DateTime(y,m,d,h,mi,s,ms)"))
 function Date(y::Year,m::Month=Month(1),d::Day=Day(1))
-    0 < m.months < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
-    return Date(Day(totaldays(y.years,m.months,d.days)))
+    0 < value(m) < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
+    return Date(UTD(totaldays(value(y),value(m),value(d))))
 end
 Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y,m,d)"))
 

@@ -52,10 +52,10 @@ function test_dates(from,to)
         end
     end
 end
-@time test_dates(-2000,2000)
+test_dates(-2000,2000)
 
 # Create "test" check manually
-test = Dates.DateTime{Dates.UTInstant{Dates.Millisecond},Dates.ISOCalendar}(Dates.UTInst(63492681600000))
+test = Dates.DateTime{Dates.UTInstant{Dates.Millisecond},Dates.ISOCalendar}(Dates.UTM(63492681600000))
 # Test DateTime construction by parts
 @test Dates.DateTime(2013) == test
 @test Dates.DateTime(2013,1) == test
@@ -64,7 +64,7 @@ test = Dates.DateTime{Dates.UTInstant{Dates.Millisecond},Dates.ISOCalendar}(Date
 @test Dates.DateTime(2013,1,1,0,0) == test
 @test Dates.DateTime(2013,1,1,0,0,0) == test
 @test Dates.DateTime(2013,1,1,0,0,0,0) == test
-test = Dates.Date(Dates.Day(734869))
+test = Dates.Date(Dates.UTD(734869))
 # Test Date construction by parts
 @test Dates.Date(2013) == test
 @test Dates.Date(2013,1) == test
@@ -73,7 +73,7 @@ test = Dates.Date(Dates.Day(734869))
 @test string(Dates.Date(1,1,1)) == "0001-01-01" # January 1st, 1 AD/CE
 @test string(Dates.Date(0,12,31)) == "0000-12-31" # December 31, 1 BC/BCE
 @test Dates.Date(1,1,1) - Dates.Date(0,12,31) == Dates.Day(1)
-@test Dates.Date(Dates.Day(-306)) == Dates.Date(0,2,29)
+@test Dates.Date(Dates.UTD(-306)) == Dates.Date(0,2,29)
 @test string(Dates.Date(0,1,1)) == "0000-01-01" # January 1st, 1 BC/BCE
 @test string(Dates.Date(-1,1,1)) == "-0001-01-01" # January 1st, 2 BC/BCE
 @test string(Dates.Date(-1000000,1,1)) == "-1000000-01-01"
@@ -711,7 +711,7 @@ end
 @test Date(DateTime(Date(2012,7,1))) == Date(2012,7,1)
 # Test conversion to and from unix
 @test Dates.unix2date(Dates.date2unix(DateTime(2000,1,1))) == DateTime(2000,1,1)
-@test Dates.DateTime(1970).instant.t.ms == Dates.UNIXEPOCH
+@test Dates.value(Dates.DateTime(1970)) == Dates.UNIXEPOCH
 # This test is very sensitive (second-precision)
 # so we need to warmup (i.e. compile) both sides of our equality
 # before running to ensure it passes

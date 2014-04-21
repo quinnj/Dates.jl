@@ -29,8 +29,8 @@ function _week(days)
 end
 
 # Accessor functions
-value(dt::Date) = dt.instant.days
-value(dt::UTDateTime) = dt.instant.t.ms
+value(dt::Date) = dt.instant.periods.value
+value(dt::UTDateTime) = dt.instant.periods.value
 _days(dt::Date) = value(dt)
 _days(dt::DateTime) = fld(value(dt),86400000)
 year(dt::TimeType) = _year(_days(dt))
@@ -64,10 +64,10 @@ convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 @vectorize_1arg Date DateTime
 
 # Traits, Equality
-hash(dt::TimeType) = hash(dt.instant)
-isless(x::TimeType,y::TimeType) = isless(x.instant,y.instant)
-isequal(x::TimeType,y::TimeType) = isequal(x.instant,y.instant)
-isfinite(::TimeType) = true
+hash(dt::TimeType) = hash(value(dt))
+isless(x::TimeType,y::TimeType) = isless(value(x),value(y))
+isequal(x::TimeType,y::TimeType) = isequal(value(x),value(y))
+isfinite{T<:TimeType}(::Union(TimeType,T)) = true
 calendar{P,C}(dt::DateTime{P,C}) = C
 calendar(dt::Date) = ISOCalendar
 precision{P,C}(dt::DateTime{P,C}) = P
@@ -147,9 +147,9 @@ function daysofweekinmonth(dt::TimeType)
            (d in [1,2,3,8,9,10,15,16,17,22,23,24,29,30,31]) ? 5 : 4
 end
 
-firstdayofweek(dt::Date) = Date(dt.instant - dayofweek(dt) + Day(1))
+firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
 firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
-lastdayofweek(dt::Date) = Date(dt.instant + (7-dayofweek(dt)))
+lastdayofweek(dt::Date) = Date(UTD(value(dt) + (7-dayofweek(dt))))
 lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
 dayofyear(dt::TimeType) = _days(dt) - totaldays(year(dt),1,1) + 1
 

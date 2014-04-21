@@ -5,55 +5,56 @@ abstract DatePeriod <: Period
 abstract TimePeriod <: Period
 
 immutable Year <: DatePeriod
-    years::Int64
+    value::Int64
     Year(x::Integer) = new(int64(x))
 end
 immutable Month <: DatePeriod
-    months::Int64
+    value::Int64
     Month(x::Integer) = new(int64(x))
 end
 immutable Week <: DatePeriod
-    weeks::Int64
+    value::Int64
     Week(x::Integer) = new(int64(x))
 end
 immutable Day <: DatePeriod
-    days::Int64
+    value::Int64
     Day(x::Integer) = new(int64(x))
 end
 
 immutable Hour <: TimePeriod
-    h::Int64
+    value::Int64
     Hour(x::Integer) = new(int64(x))
 end
 immutable Minute <: TimePeriod
-    m::Int64
+    value::Int64
     Minute(x::Integer) = new(int64(x))
 end
 immutable Second <: TimePeriod
-    s::Int64
+    value::Int64
     Second(x::Integer) = new(int64(x))
 end
 immutable Millisecond <: TimePeriod
-    ms::Int64
+    value::Int64
     Millisecond(x::Integer) = new(int64(x))
 end
 
 # Instant types represent different monotonically increasing timelines
-abstract Instant
+abstract Instant{P<:Period} <: AbstractTime
 
 # UTInstant is based on UT seconds, or 1/86400th of a turn of the earth
 immutable UTInstant{P<:Period} <: Instant
-    t::P
+    periods::P
 end
 
-# Convenience default constructor
-UTInst(x) = UTInstant(Millisecond(x))
+# Convenience default constructors
+UTM(x) = UTInstant(Millisecond(x))
+UTD(x) = UTInstant(Day(x))
 
 # Calendar types provide dispatch rules for interpretating instant 
 # timelines in human-readable form. Calendar types are used as
 # type tags in the DateTime type for dispatching to methods
 # implementing the Instant=>Human-Form conversion rules.
-abstract Calendar
+abstract Calendar <: AbstractTime
 
 # ISOCalendar implements the ISO 8601 standard (en.wikipedia.org/wiki/ISO_8601)
 # Notably based on the proleptic Gregorian calendar
@@ -73,10 +74,7 @@ end
 typealias UTDateTime DateTime{UTInstant{Millisecond},ISOCalendar}
 
 immutable Date <: TimeType
-    instant::Day
-    # Custom constructor to prevent Date(2013)
-    # from auto-converting to Date(Day(2013))
-    Date(x::Day) = new(x)
+    instant::UTInstant{Day}
 end
 
 # Convert y,m,d to # of Rata Die days
@@ -92,10 +90,10 @@ function DateTime(y::Integer,m::Integer=1,d::Integer=1,
                   h::Integer=0,mi::Integer=0,s::Integer=0,ms::Integer=0)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
     rata = ms + 1000*(s + 60mi + 3600h + 86400*totaldays(y,m,d))
-    return UTDateTime(UTInst(rata))
+    return UTDateTime(UTM(rata))
 end
 
 function Date(y::Integer,m::Integer=1,d::Integer=1)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
-    return Date(Day(totaldays(y,m,d)))
+    return Date(UTD(totaldays(y,m,d)))
 end
