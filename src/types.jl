@@ -6,40 +6,32 @@ abstract TimePeriod <: Period
 
 immutable Year <: DatePeriod
     value::Int64
-    Year(x::Integer) = new(int64(x))
 end
 immutable Month <: DatePeriod
     value::Int64
-    Month(x::Integer) = new(int64(x))
 end
 immutable Week <: DatePeriod
     value::Int64
-    Week(x::Integer) = new(int64(x))
 end
 immutable Day <: DatePeriod
     value::Int64
-    Day(x::Integer) = new(int64(x))
 end
 
 immutable Hour <: TimePeriod
     value::Int64
-    Hour(x::Integer) = new(int64(x))
 end
 immutable Minute <: TimePeriod
     value::Int64
-    Minute(x::Integer) = new(int64(x))
 end
 immutable Second <: TimePeriod
     value::Int64
-    Second(x::Integer) = new(int64(x))
 end
 immutable Millisecond <: TimePeriod
     value::Int64
-    Millisecond(x::Integer) = new(int64(x))
 end
 
 # Instant types represent different monotonically increasing timelines
-abstract Instant{P<:Period} <: AbstractTime
+abstract Instant <: AbstractTime
 
 # UTInstant is based on UT seconds, or 1/86400th of a turn of the earth
 immutable UTInstant{P<:Period} <: Instant
