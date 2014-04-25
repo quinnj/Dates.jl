@@ -117,6 +117,12 @@ Base.div{P<:Period}(::Millisecond,::P) = zero(P)=#
 
 
 # Range tests
-# Rerun/Finish coverage tests
-# Make tests robust over range of Date inputs, near Date(0)
-# IO
+# IO work: more robust, better, quicker errors, tests, test, tests...
+# Period conversions?
+# more work on recur
+# perf.jl
+# docs
+
+# Longer term
+ # Timezone parameter to DateTime?
+ # Timezone.jl package

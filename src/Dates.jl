@@ -1,19 +1,17 @@
 module Dates
 
-import Base: hash, isless, isequal, isfinite, convert, precision,
-             typemax, typemin, zero, one, string, show, mod, div
-
 export Calendar, ISOCalendar,
-    Date, DateTime, UTDateTime,
+    Date, DateTime,
     Period, Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
     # accessors
     year, month, week, day, hour, minute, second, millisecond,
-    ratadays2date, date2ratadays, unix2date, date2unix,
+    # conversions
+    ratadays2date, date2ratadays, unix2date, date2unix, julian2date, date2julian,
     # date functions
     monthname, monthabbr, dayname, dayabbr, now,
-    isleap, lastdayofmonth, dayofweek, dayofyear,
+    isleap, lastdayofmonth, firstdayofmonth, dayofweek, dayofyear,
     dayofweekofmonth, daysofweekinmonth, firstdayofweek, lastdayofweek,
-    recur, calendar, timezone, precision, ISOFormat,
+    recur, calendar, precision, ISOFormat,
     # consts
     Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday,
     Mon,Tue,Wed,Thu,Fri,Sat,Sun,

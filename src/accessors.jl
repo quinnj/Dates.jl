@@ -53,36 +53,36 @@ millisecond(dt::DateTime) = mod(value(dt),1000)
 # Conversion/Promotion
 Date(dt::TimeType) = convert(Date,dt)
 DateTime(dt::TimeType) = convert(DateTime,dt)
-convert{D<:DateTime}(::Type{D},dt::Date) = UTDateTime(UTM(value(dt)*86400000))
-convert(::Type{Date},dt::DateTime) = Date(UTD(div(value(dt),86400000)))
-convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
-convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
+Base.convert{D<:DateTime}(::Type{D},dt::Date) = UTDateTime(UTM(value(dt)*86400000))
+Base.convert(::Type{Date},dt::DateTime) = Date(UTD(div(value(dt),86400000)))
+Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
+Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 
 @vectorize_1arg DateTime Date
 @vectorize_1arg Date DateTime
 
 # Traits, Equality
-hash(dt::TimeType) = hash(value(dt))
-isfinite{T<:TimeType}(::Union(TimeType,T)) = true
+Base.hash(dt::TimeType) = hash(value(dt))
+Base.isfinite{T<:TimeType}(::Union(TimeType,T)) = true
 calendar{P,C}(dt::DateTime{P,C}) = C
 calendar(dt::Date) = ISOCalendar
-precision{P,C}(dt::DateTime{P,C}) = P
-precision(dt::Date) = UTInstant{Day}
-typemax{T<:DateTime}(::Type{T}) = DateTime(292277024,12,31,23,59,59)
-typemin{T<:DateTime}(::Type{T}) = DateTime(-292277023,1,1,0,0,0)
-typemax(::Type{Date}) = Date(252522163911149,12,31)
-typemin(::Type{Date}) = Date(-252522163911150,1,1)
+Base.precision{P,C}(dt::DateTime{P,C}) = P
+Base.precision(dt::Date) = UTInstant{Day}
+Base.typemax{T<:DateTime}(::Type{T}) = DateTime(292277024,12,31,23,59,59)
+Base.typemin{T<:DateTime}(::Type{T}) = DateTime(-292277023,1,1,0,0,0)
+Base.typemax(::Type{Date}) = Date(252522163911149,12,31)
+Base.typemin(::Type{Date}) = Date(-252522163911150,1,1)
 # Date-DateTime promotion/isless/isequal
 Base.promote_rule{D<:DateTime}(::Type{Date},::Type{D}) = D
-isless(x::Date,y::Date) = isless(value(x),value(y))
-isless{D<:DateTime}(x::D,y::D) = isless(value(x),value(y))
-isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
-isequal(x::Date,y::Date) = isequal(value(x),value(y))
-isequal{D<:DateTime}(x::D,y::D) = isequal(value(x),value(y))
-isequal(x::TimeType,y::TimeType) = isequal(promote(x,y)...)
+Base.isless(x::Date,y::Date) = isless(value(x),value(y))
+Base.isless{D<:DateTime}(x::D,y::D) = isless(value(x),value(y))
+Base.isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
+Base.isequal(x::Date,y::Date) = isequal(value(x),value(y))
+Base.isequal{D<:DateTime}(x::D,y::D) = isequal(value(x),value(y))
+Base.isequal(x::TimeType,y::TimeType) = isequal(promote(x,y)...)
 
 # TODO: optimize this
-function string(dt::DateTime)
+function Base.string(dt::DateTime)
     y,m,d = _day2date(_days(dt))
     h,mi,s = hour(dt),minute(dt),second(dt)
     yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
@@ -94,15 +94,15 @@ function string(dt::DateTime)
     ms = millisecond(dt) == 0 ? "" : string(millisecond(dt)/1000.0)[2:end]
     return "$yy-$mm-$(dd)T$hh:$mii:$ss$ms"
 end
-show(io::IO,x::DateTime) = print(io,string(x))
-function string(dt::Date)
+Base.show(io::IO,x::DateTime) = print(io,string(x))
+function Base.string(dt::Date)
     y,m,d = _day2date(value(dt))
     yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
     mm = lpad(m,2,"0")
     dd = lpad(d,2,"0")
     return "$yy-$mm-$dd"
 end
-show(io::IO,x::Date) = print(io,string(x))
+Base.show(io::IO,x::Date) = print(io,string(x))
 
 # Date functions
 #TODO: make these enums

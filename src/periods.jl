@@ -16,31 +16,32 @@ for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
 end
 # Now we're safe to define Period-Number conversions
 # Anything an Int64 can convert to, a Period can convert to
-convert{T<:Number}(::Type{T},x::Period) = convert(T,value(x))
+Base.convert{T<:Number}(::Type{T},x::Period) = convert(T,value(x))
 # Error quickly if x can't convert losslessly to Int64
-convert{P<:Period}(::Type{P},x::Number) = P(convert(Int64,x))
+Base.convert{P<:Period}(::Type{P},x::Number) = P(convert(Int64,x))
 
 #Print/show/traits
-string{P<:Period}(x::P) = string(value(x),_units(x))
-show(io::IO,x::Period) = print(io,string(x))
-zero{P<:Period}(::Union(Type{P},P)) = P(0)
-one{P<:Period}(::Union(Type{P},P)) = P(1)
-typemin{P<:Period}(::Type{P}) = P(typemin(Int64))
-typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
+Base.string{P<:Period}(x::P) = string(value(x),_units(x))
+Base.show(io::IO,x::Period) = print(io,string(x))
+Base.zero{P<:Period}(::Union(Type{P},P)) = P(0)
+Base.one{P<:Period}(::Union(Type{P},P)) = P(1)
+Base.typemin{P<:Period}(::Type{P}) = P(typemin(Int64))
+Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
 
 (-){P<:Period}(x::P) = P(-value(x))
-isless {P<:Period}(x::P,y::P) = isless(value(x),value(y))
-isequal{P<:Period}(x::P,y::P) = isequal(value(x),value(y))
-isless {R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
-isequal{R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
-isless {R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
-isequal{R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isless {P<:Period}(x::P,y::P) = isless(value(x),value(y))
+Base.isequal{P<:Period}(x::P,y::P) = isequal(value(x),value(y))
+Base.isless {R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isequal{R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isless {R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isequal{R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
 
-isless(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
-isequal(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
+Base.isless(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
+Base.isequal(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
 
 #Period Arithmetic:
+import Base.div
 let vec_ops = [:.+,:.-,:.*,:.%,:div]
     for op in [:+,:-,:*,:%,vec_ops]
         @eval begin
@@ -88,14 +89,14 @@ periodisless(::Period,::Millisecond) = false
 type CompoundPeriod
     periods::Array{Period,1}
 end
-function string(x::CompoundPeriod)
+function Base.string(x::CompoundPeriod)
     s = ""
     for p in x.periods
         s *= ", " * string(p)
     end
     return s[3:end]
 end
-show(io::IO,x::CompoundPeriod) = print(io,string(x))
+Base.show(io::IO,x::CompoundPeriod) = print(io,string(x))
 # E.g. Year(1) + Day(1)
 (+)(x::Period,y::Period) = CompoundPeriod(sort!(Period[x,y],rev=true,lt=periodisless))
 (+)(x::CompoundPeriod,y::Period) = (sort!(push!(x.periods,y) ,rev=true,lt=periodisless); return x)
