@@ -29,8 +29,7 @@ function _week(days)
 end
 
 # Accessor functions
-value(dt::Date) = dt.instant.periods.value
-value(dt::UTDateTime) = dt.instant.periods.value
+value(dt::TimeType) = dt.instant.periods.value
 _days(dt::Date) = value(dt)
 _days(dt::DateTime) = fld(value(dt),86400000)
 year(dt::TimeType) = _year(_days(dt))

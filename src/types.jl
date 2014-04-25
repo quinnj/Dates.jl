@@ -69,12 +69,14 @@ abstract TimeType <: AbstractTime
 # by multiple dispatch.
 immutable DateTime{T<:Instant,C<:Calendar} <: TimeType
     instant::T
+    DateTime(x::T) = new(x)
 end 
 
 typealias UTDateTime DateTime{UTInstant{Millisecond},ISOCalendar}
 
 immutable Date <: TimeType
     instant::UTInstant{Day}
+    Date(x::UTInstant{Day}) = new(x)
 end
 
 # Convert y,m,d to # of Rata Die days
