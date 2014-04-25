@@ -51,11 +51,10 @@ millisecond(dt::DateTime) = mod(value(dt),1000)
 @vectorize_1arg DateTime millisecond
 
 # Conversion/Promotion
-#different calendars?
-#different timezones?
-#different precision levels?
-DateTime(dt::Date) = DateTime(year(dt),month(dt),day(dt))
-Date(dt::DateTime) = Date(year(dt),month(dt),day(dt))
+Date(dt::TimeType) = convert(Date,dt)
+DateTime(dt::TimeType) = convert(DateTime,dt)
+convert{D<:DateTime}(::Type{D},dt::Date) = UTDateTime(UTM(value(dt)*86400000))
+convert(::Type{Date},dt::DateTime) = Date(UTD(div(value(dt),86400000)))
 convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
 convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 
@@ -64,17 +63,23 @@ convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 
 # Traits, Equality
 hash(dt::TimeType) = hash(value(dt))
-isless(x::TimeType,y::TimeType) = isless(value(x),value(y))
-isequal(x::TimeType,y::TimeType) = isequal(value(x),value(y))
 isfinite{T<:TimeType}(::Union(TimeType,T)) = true
 calendar{P,C}(dt::DateTime{P,C}) = C
 calendar(dt::Date) = ISOCalendar
 precision{P,C}(dt::DateTime{P,C}) = P
-precision(dt::Date) = Day
+precision(dt::Date) = UTInstant{Day}
 typemax{T<:DateTime}(::Type{T}) = DateTime(292277024,12,31,23,59,59)
 typemin{T<:DateTime}(::Type{T}) = DateTime(-292277023,1,1,0,0,0)
 typemax(::Type{Date}) = Date(252522163911149,12,31)
 typemin(::Type{Date}) = Date(-252522163911150,1,1)
+# Date-DateTime promotion/isless/isequal
+Base.promote_rule{D<:DateTime}(::Type{Date},::Type{D}) = D
+isless(x::Date,y::Date) = isless(value(x),value(y))
+isless{D<:DateTime}(x::D,y::D) = isless(value(x),value(y))
+isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
+isequal(x::Date,y::Date) = isequal(value(x),value(y))
+isequal{D<:DateTime}(x::D,y::D) = isequal(value(x),value(y))
+isequal(x::TimeType,y::TimeType) = isequal(promote(x,y)...)
 
 # TODO: optimize this
 function string(dt::DateTime)
