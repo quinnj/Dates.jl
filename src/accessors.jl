@@ -129,15 +129,25 @@ dayabbr(dt::TimeType) = DAYSOFWEEKABBR[dayofweek(dt)]
 
 const DAYSINMONTH = Int64[31,28,31,30,31,30,31,31,30,31,30,31]
 _isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
-function _lastdayofmonth(y,m)
+function lastdayofmonth(y,m)
     d = DAYSINMONTH[m]::Int64
     return d + (m == 2 && _isleap(y))
 end
 isleap(dt::TimeType) = _isleap(year(dt))
-lastdayofmonth(dt::TimeType) = _lastdayofmonth(year(dt),month(dt))
-firstdayofmonth(dt::Date) = Date(year(dt),month(dt),1)
-firstdayofmonth(dt::DateTime) = DateTime(year(dt),month(dt),1)
-# Sunday = 0, Monday = 1....Saturday = 6
+function lastdayofmonth(dt::Date) 
+    y,m,d = _day2date(_days(dt))
+    return Date(y,m,lastdayofmonth(y,m))
+end
+lastdayofmonth(dt::DateTime) = lastdayofmonth(Date(dt))
+function firstdayofmonth(dt::Date)
+    y,m,d = _day2date(_days(dt))
+    return Date(y,m,1)
+end
+function firstdayofmonth(dt::DateTime)
+    y,m,d = _day2date(_days(dt))
+    return DateTime(y,m,1,0,0,0,0)
+end
+# Monday = 1....Sunday = 7
 dayofweek(dt::TimeType) = (_ = _days(dt) % 7; return _ == 0 ? 7 : _)
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
 dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
@@ -150,7 +160,6 @@ function daysofweekinmonth(dt::TimeType)
            ld == 30 ? ((d in [1,2,8,9,15,16,22,23,29,30]) ? 5 : 4) :
            (d in [1,2,3,8,9,10,15,16,17,22,23,24,29,30,31]) ? 5 : 4
 end
-
 firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
 firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
 lastdayofweek(dt::Date) = Date(UTD(value(dt) + (7-dayofweek(dt))))
