@@ -79,15 +79,44 @@ function totaldays(y,m,d)
     return d + mdays + 365z + fld(z,4) - fld(z,100) + fld(z,400) - 306
 end
 
-# DateTime constructor with defaults
-function DateTime(y::Integer,m::Integer=1,d::Integer=1,
-                  h::Integer=0,mi::Integer=0,s::Integer=0,ms::Integer=0)
+### CONSTRUCTORS ###
+# Core constructors
+function DateTime(y::Int64,m::Int64=1,d::Int64=1,
+                  h::Int64=0,mi::Int64=0,s::Int64=0,ms::Int64=0)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
     rata = ms + 1000*(s + 60mi + 3600h + 86400*totaldays(y,m,d))
     return UTDateTime(UTM(rata))
 end
-
-function Date(y::Integer,m::Integer=1,d::Integer=1)
+function Date(y::Int64,m::Int64=1,d::Int64=1)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
     return Date(UTD(totaldays(y,m,d)))
 end
+
+# Convenience constructors from Periods
+function DateTime(y::Year=Year(1),m::Month=Month(1),d::Day=Day(1),
+                  h::Hour=Hour(0),mi::Minute=Minute(0),
+                  s::Second=Second(0),ms::Millisecond=Millisecond(0))
+    return DateTime(value(y),value(m),value(d),
+                        value(h),value(mi),value(s),value(ms))
+end
+DateTime(x::Period...) = throw(ArgumentError("Required argument order is DateTime(y[,m,d,h,mi,s,ms])"))
+
+Date(y::Year,m::Month=Month(1),d::Day=Day(1)) = Date(value(y),value(m),value(d))
+Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y[,m,d])"))
+
+# Fallback constructors
+_c(x) = convert(Int64,x)
+DateTime(y,m=1,d=1,h=0,mi=0,s=0,ms=0) = DateTime(_c(y),_c(m),_c(d),_c(h),_c(mi),_c(s),_c(ms))
+Date(y,m=1,d=1) = Date(_c(y),_c(m),_c(d))
+
+# Custom 2-arg colon constructor for DateTime
+# otherwise, the default step would be Millisecond(1)
+#=Base.colon{T<:DateTime}(start::T, stop::T) = Base.StepRange(start, Day(1), stop)
+Base.rem{P<:Period}(::Millisecond,::P) = zero(P)
+Base.div{P<:Period}(::Millisecond,::P) = zero(P)=#
+
+
+# Range tests
+# Rerun/Finish coverage tests
+# Make tests robust over range of Date inputs, near Date(0)
+# IO

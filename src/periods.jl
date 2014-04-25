@@ -1,14 +1,26 @@
 #Period types
 value{P<:Period}(x::P) = x.value
 
+# The default constructors for Periods work well in almost all cases
+# P(x) = new((convert(Int64,x))
+# The following definitions are for Period-specific safety
 for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
+    # This ensures that we can't convert between Periods
+    @eval $p(x::Period) = throw(ArgumentError("Can't convert $(typeof(x)) to $($p)"))
+    # Unless the Periods are the same type
     @eval $p(x::$p) = x
+    # Convenience method for show()
+    @eval _units(x::$p) = " " * lowercase(string($p)) * (abs(value(x)) == 1 ? "" : "s")
+    # Don't allow misuse of Periods on Date/DateTime
+    @eval $p(x::TimeType) = throw(ArgumentError("$($p)() is for constructing the $($p) type. Use $(lowercase(string($p)))(dt) instead"))
 end
-convert{R<:Real}(::Type{R},x::Period) = convert(R,value(x))
-convert{P<:Period}(::Type{P},x::Real) = P(int64(x))
+# Now we're safe to define Period-Number conversions
+# Anything an Int64 can convert to, a Period can convert to
+convert{T<:Number}(::Type{T},x::Period) = convert(T,value(x))
+# Error quickly if x can't convert losslessly to Int64
+convert{P<:Period}(::Type{P},x::Number) = P(convert(Int64,x))
 
 #Print/show/traits
-_units(x::Period) = " " * lowercase(string(typeof(x).name)) * (abs(value(x)) == 1 ? "" : "s")
 string{P<:Period}(x::P) = string(value(x),_units(x))
 show(io::IO,x::Period) = print(io,string(x))
 zero{P<:Period}(::Union(Type{P},P)) = P(0)
@@ -38,10 +50,8 @@ let vec_ops = [:.+,:.-,:.*,:.%,:div]
         ($op){P<:Period}(x::P,y::Integer) = P(($op)(value(x),int64(y)))
         ($op){P<:Period}(x::Integer,y::P) = P(($op)(int64(x),value(y)))
         #Period-Real
-        #TODO: using isinteger here isn't really safe because it allows Int128 and BigInts
-        # what we really need is an isint64() function
-        ($op){P<:Period}(x::P,y::Real) = P(($op)(value(x),isinteger(y) ? int64(y) : throw(ArgumentError("Can't convert $y to Integer"))))
-        ($op){P<:Period}(x::Real,y::P) = P(($op)(isinteger(x) ? int64(x) : throw(ArgumentError("Can't convert $y to Integer")),value(y)))
+        ($op){P<:Period}(x::P,y::Real) = P(($op)(value(x),convert(Int64,y)))
+        ($op){P<:Period}(x::Real,y::P) = P(($op)(convert(Int64,x),value(y)))
         end
         #Vectorized
         if op in vec_ops
@@ -86,27 +96,12 @@ function string(x::CompoundPeriod)
     return s[3:end]
 end
 show(io::IO,x::CompoundPeriod) = print(io,string(x))
-# Year(1) + Day(1)
+# E.g. Year(1) + Day(1)
 (+)(x::Period,y::Period) = CompoundPeriod(sort!(Period[x,y],rev=true,lt=periodisless))
 (+)(x::CompoundPeriod,y::Period) = (sort!(push!(x.periods,y) ,rev=true,lt=periodisless); return x)
-# Year(1) - Month(1)
+# E.g. Year(1) - Month(1)
 (-)(x::Period,y::Period) = CompoundPeriod(sort!(Period[x,-y],rev=true,lt=periodisless))
 (-)(x::CompoundPeriod,y::Period) = (sort!(push!(x.periods,-y),rev=true,lt=periodisless); return x)
-
-function DateTime(y::Year=Year(1),m::Month=Month(1),d::Day=Day(1),
-                  h::Hour=Hour(0),mi::Minute=Minute(0),
-                  s::Second=Second(0),ms::Millisecond=Millisecond(0))
-    0 < value(m) < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
-    rata = ms + 1000*(value(s) + 60*value(mi) + 3600*value(h) + 
-                         86400*totaldays(value(y),value(m),value(d)))
-    return UTDateTime(UTM(rata))
-end
-DateTime(x::Period...) = throw(ArgumentError("Required argument order is DateTime(y,m,d,h,mi,s,ms)"))
-function Date(y::Year,m::Month=Month(1),d::Day=Day(1))
-    0 < value(m) < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
-    return Date(UTD(totaldays(value(y),value(m),value(d))))
-end
-Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y,m,d)"))
 
 function (+)(x::TimeType,y::CompoundPeriod)
     for p in y.periods
