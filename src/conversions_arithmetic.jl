@@ -19,10 +19,6 @@ end
 # Returns # of julian days since -4713-11-24T12:00:00 UTC
 date2julian(dt::DateTime) = (value(dt) - JULIANEPOCH)/86400000.0
 
-#wrapping arithmetic
-monthwrap(m1,m2) = (v = (m1 + m2) % 12; return v == 0 ? 12 : v < 0 ? 12 + v : v)
-yearwrap(y,m1,m2) = y + fld(m1 + m2 - 1,12)
-
 # Instant arithmetic
 for op in (:+,:*,:%,:/)
     @eval ($op)(x::Instant,y::Instant) = error("Operation not defined for Instants")
@@ -38,43 +34,51 @@ end
 (-){T<:TimeType}(x::T,y::T) = x.instant - y.instant
 
 function (+)(dt::DateTime,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = _lastdayofmonth(ny,m)
+    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = lastdayofmonth(ny,m)
     return DateTime(ny,m,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (+)(dt::Date,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = _lastdayofmonth(ny,m)
+    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = lastdayofmonth(ny,m)
     return Date(ny,m,d <= ld ? d : ld)
 end
 function (-)(dt::DateTime,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = _lastdayofmonth(ny,m)
+    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = lastdayofmonth(ny,m)
     return DateTime(ny,m,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (-)(dt::Date,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = _lastdayofmonth(ny,m)
+    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = lastdayofmonth(ny,m)
     return Date(ny,m,d <= ld ? d : ld)
 end
+
+# Date/DateTime-Month arithmetic
+# monthwrap adds two months with wraparound behavior (i.e. 12 + 1 == 1)
+monthwrap(m1,m2) = (v = (m1 + m2) % 12; return v == 0 ? 12 : v < 0 ? 12 + v : v)
+# yearwrap takes a starting year/month and a month to add and returns
+# the resulting year with wraparound behavior (i.e. 2000-12 + 1 == 2001)
+yearwrap(y,m1,m2) = y + fld(m1 + m2 - 1,12)
+
 function (+)(dt::DateTime,z::Month) 
     y,m,d = _day2date(_days(dt))
     ny = yearwrap(y,m,value(z))
-    mm = monthwrap(m,value(z)); ld = _lastdayofmonth(ny,mm)
+    mm = monthwrap(m,value(z)); ld = lastdayofmonth(ny,mm)
     return DateTime(ny,mm,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (+)(dt::Date,z::Month) 
     y,m,d = _day2date(_days(dt))
     ny = yearwrap(y,m,value(z))
-    mm = monthwrap(m,value(z)); ld = _lastdayofmonth(ny,mm)
+    mm = monthwrap(m,value(z)); ld = lastdayofmonth(ny,mm)
     return Date(ny,mm,d <= ld ? d : ld)
 end
 function (-)(dt::DateTime,z::Month) 
     y,m,d = _day2date(_days(dt))
     ny = yearwrap(y,m,-value(z))
-    mm = monthwrap(m,-value(z)); ld = _lastdayofmonth(ny,mm)
+    mm = monthwrap(m,-value(z)); ld = lastdayofmonth(ny,mm)
     return DateTime(ny,mm,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (-)(dt::Date,z::Month) 
     y,m,d = _day2date(_days(dt))
     ny = yearwrap(y,m,-value(z))
-    mm = monthwrap(m,-value(z)); ld = _lastdayofmonth(ny,mm)
+    mm = monthwrap(m,-value(z)); ld = lastdayofmonth(ny,mm)
     return Date(ny,mm,d <= ld ? d : ld)
 end
 (+)(x::Date,y::Week) = return Date(UTD(value(x) + 7*value(y)))
