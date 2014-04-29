@@ -52,7 +52,7 @@ end
 
 # Date/DateTime-Month arithmetic
 # monthwrap adds two months with wraparound behavior (i.e. 12 + 1 == 1)
-monthwrap(m1,m2) = (v = (m1 + m2) % 12; return v == 0 ? 12 : v < 0 ? 12 + v : v)
+monthwrap(m1,m2) = (v = mod1(m1+m2,12); return v < 0 ? 12 + v : v)
 # yearwrap takes a starting year/month and a month to add and returns
 # the resulting year with wraparound behavior (i.e. 2000-12 + 1 == 2001)
 yearwrap(y,m1,m2) = y + fld(m1 + m2 - 1,12)
