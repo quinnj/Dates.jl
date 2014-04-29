@@ -9,11 +9,21 @@ function _year(days)
    z = days + 306; h = 100z - 25; a = fld(h,3652425); b = a - fld(a,4);
    y = fld(100b+h,36525); c = b + z - 365y - fld(y,4); m = div(5c+456,153); 
    return m > 12 ? y+1 : y
-end 
-function _month(days)
+end
+function _yearmonth(days)
     z = days + 306; h = 100z - 25; a = fld(h,3652425); b = a - fld(a,4);
     y = fld(100b+h,36525); c = b + z - 365y - fld(y,4); m = div(5c+456,153); 
+    return m > 12 ? (y+1,m-12) : (y,m)
+end
+function _month(days)
+    z = days + 306; h = 100z - 25; a = fld(h,3652425); b = a - fld(a,4);
+    y = fld(100b+h,36525); c = b + z - 365y - fld(y,4); m = div(5c+456,153);
     return m > 12 ? m-12 : m
+end
+function _monthday(days)
+    z = days + 306; h = 100z - 25; a = fld(h,3652425); b = a - fld(a,4);
+    y = fld(100b+h,36525); c = b + z - 365y - fld(y,4); m = div(5c+456,153);
+    d = c - div(153m-457,5); return m > 12 ? (m-12,d) : (m,d)
 end
 function _day(days)
     z = days + 306; h = 100z - 25; a = fld(h,3652425); b = a - fld(a,4);
@@ -40,6 +50,11 @@ hour(dt::DateTime)   = mod(fld(value(dt),3600000),24)
 minute(dt::DateTime) = mod(fld(value(dt),60000),60)
 second(dt::DateTime) = mod(fld(value(dt),1000),60)
 millisecond(dt::DateTime) = mod(value(dt),1000)
+
+yearmonth(dt::TimeType) = _yearmonth(_days(dt))
+monthday(dt::TimeType) = _monthday(_days(dt))
+yearmonthday(dt::TimeType) = _day2date(_days(dt))
+#TODO: add hourminute, hourminutesecond
 
 @vectorize_1arg TimeType year
 @vectorize_1arg TimeType month
@@ -148,7 +163,7 @@ function firstdayofmonth(dt::DateTime)
     return DateTime(y,m,1,0,0,0,0)
 end
 # Monday = 1....Sunday = 7
-dayofweek(dt::TimeType) = (_ = _days(dt) % 7; return _ == 0 ? 7 : _)
+dayofweek(dt::TimeType) = mod1(_days(dt),7)
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
 dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
     d < 15 ? 2 : d < 22 ? 3 : d < 29 ? 4 : 5)
