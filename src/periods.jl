@@ -111,3 +111,53 @@ function (+)(x::TimeType,y::CompoundPeriod)
     return x
 end
 (+)(x::CompoundPeriod,y::TimeType) = y + x
+
+# Date/DateTime Ranges
+# Given a start and end date, how many steps/periods are in between
+to_days(x::Year) = itrunc(value(x)*365.2425)
+to_days(x::Month) = itrunc(value(x)*30.436875)
+to_days(x::Week) = value(x)*7
+to_days(x::Day) = value(x)
+
+function Base.length{P<:Period}(r::StepRange{Date,P})
+    n = integer(div(r.stop+r.step - r.start, to_days(r.step)))
+    isempty(r) ? zero(n) : n
+end
+
+to_ms(x::Year) = itrunc(value(x)*365.2425*86400000.0)
+to_ms(x::Month) = itrunc(value(x)*30.426875*86400000.0)
+to_ms(x::Week) = value(x)*7*86400000
+to_ms(x::Day) = value(x)*86400000
+to_ms(x::Hour) = value(x)*3600000
+to_ms(x::Minute) = value(x)*60000
+to_ms(x::Second) = value(x)*1000
+to_ms(x::Millisecond) = value(x)
+
+function Base.length{T<:DateTime,P<:Period}(r::StepRange{T,P})
+    n = integer(div(r.stop+r.step - r.start, to_ms(r.step)))
+    isempty(r) ? zero(n) : n
+end
+
+# Given a start and stop date, calculate the difference between
+# the given stop date and the last valid date given the Period step
+# last = stop - steprem(start,stop,step)
+Base.steprem(a::Date,b::Date,c::Day) = (b-a) % c
+Base.steprem(a::DateTime,b::DateTime,c::Millisecond) = (b-a) % c
+
+function Base.steprem(start::TimeType,stop::TimeType,step::Period)
+    t = start
+    while (t+step) <= stop
+        t += step
+    end
+    return stop - t
+end
+
+# Specialize for Date-Day, DateTime-Millisecond?
+import Base.in
+function in{T<:TimeType,S<:Period}(x, r::StepRange{T,S})
+    step(r) == zero(S) && return x == first(r)
+    for d in r
+        d == x && return true
+    end
+    return false
+end

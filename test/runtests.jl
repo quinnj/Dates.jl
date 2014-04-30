@@ -1252,90 +1252,147 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test test == dt + y - m + w - d + (h - mi + s - ms)
 @test (dt + Dates.Year(4)) + Dates.Day(1) == dt + (Dates.Year(4) + Dates.Day(1))
 # traits
-@test Dates._units(Year(0)) == " years"
-@test Dates._units(Year(1)) == " year"
-@test Dates._units(Year(-1)) == " year"
-@test Dates._units(Year(2)) == " years"
-@test Dates.string(Year(0)) == "0 years"
-@test Dates.string(Year(1)) == "1 year"
-@test Dates.string(Year(-1)) == "-1 year"
-@test Dates.string(Year(2)) == "2 years"
-@test zero(Year) == Year(0)
-@test zero(Year(10)) == Year(0)
-@test zero(Month) == Month(0)
-@test zero(Month(10)) == Month(0)
-@test zero(Day) == Day(0)
-@test zero(Day(10)) == Day(0)
-@test zero(Hour) == Hour(0)
-@test zero(Hour(10)) == Hour(0)
-@test zero(Minute) == Minute(0)
-@test zero(Minute(10)) == Minute(0)
-@test zero(Second) == Second(0)
-@test zero(Second(10)) == Second(0)
-@test zero(Millisecond) == Millisecond(0)
-@test zero(Millisecond(10)) == Millisecond(0)
-@test one(Year) == Year(1)
-@test one(Year(10)) == Year(1)
-@test one(Month) == Month(1)
-@test one(Month(10)) == Month(1)
-@test one(Day) == Day(1)
-@test one(Day(10)) == Day(1)
-@test one(Hour) == Hour(1)
-@test one(Hour(10)) == Hour(1)
-@test one(Minute) == Minute(1)
-@test one(Minute(10)) == Minute(1)
-@test one(Second) == Second(1)
-@test one(Second(10)) == Second(1)
-@test one(Millisecond) == Millisecond(1)
-@test one(Millisecond(10)) == Millisecond(1)
-@test Year(-1) < Year(1)
-@test !(Year(-1) > Year(1))
-@test Year(1) == Year(1)
-@test_throws ArgumentError Year(1) == 1
-@test_throws ArgumentError 1 == Year(1)
-@test_throws ArgumentError Year(1) < 1
-@test_throws ArgumentError 1 < Year(1)
-@test Month(-1) < Month(1)
-@test !(Month(-1) > Month(1))
-@test Month(1) == Month(1)
-@test_throws ArgumentError Month(1) == 1
-@test_throws ArgumentError 1 == Month(1)
-@test_throws ArgumentError Month(1) < 1
-@test_throws ArgumentError 1 < Month(1)
-@test Day(-1) < Day(1)
-@test !(Day(-1) > Day(1))
-@test Day(1) == Day(1)
-@test_throws ArgumentError Day(1) == 1
-@test_throws ArgumentError 1 == Day(1)
-@test_throws ArgumentError Day(1) < 1
-@test_throws ArgumentError 1 < Day(1)
-@test Hour(-1) < Hour(1)
-@test !(Hour(-1) > Hour(1))
-@test Hour(1) == Hour(1)
-@test_throws ArgumentError Hour(1) == 1
-@test_throws ArgumentError 1 == Hour(1)
-@test_throws ArgumentError Hour(1) < 1
-@test_throws ArgumentError 1 < Hour(1)
-@test Minute(-1) < Minute(1)
-@test !(Minute(-1) > Minute(1))
-@test Minute(1) == Minute(1)
-@test_throws ArgumentError Minute(1) == 1
-@test_throws ArgumentError 1 == Minute(1)
-@test_throws ArgumentError Minute(1) < 1
-@test_throws ArgumentError 1 < Minute(1)
-@test Second(-1) < Second(1)
-@test !(Second(-1) > Second(1))
-@test Second(1) == Second(1)
-@test_throws ArgumentError Second(1) == 1
-@test_throws ArgumentError 1 == Second(1)
-@test_throws ArgumentError Second(1) < 1
-@test_throws ArgumentError 1 < Second(1)
-@test Millisecond(-1) < Millisecond(1)
-@test !(Millisecond(-1) > Millisecond(1))
-@test Millisecond(1) == Millisecond(1)
-@test_throws ArgumentError Millisecond(1) == 1
-@test_throws ArgumentError 1 == Millisecond(1)
-@test_throws ArgumentError Millisecond(1) < 1
-@test_throws ArgumentError 1 < Millisecond(1)
-@test_throws ArgumentError Year(1) < Millisecond(1)
-@test_throws ArgumentError Year(1) == Millisecond(1)
+@test Dates._units(Dates.Year(0)) == " years"
+@test Dates._units(Dates.Year(1)) == " year"
+@test Dates._units(Dates.Year(-1)) == " year"
+@test Dates._units(Dates.Year(2)) == " years"
+@test Dates.string(Dates.Year(0)) == "0 years"
+@test Dates.string(Dates.Year(1)) == "1 year"
+@test Dates.string(Dates.Year(-1)) == "-1 year"
+@test Dates.string(Dates.Year(2)) == "2 years"
+@test zero(Dates.Year) == Dates.Year(0)
+@test zero(Dates.Year(10)) == Dates.Year(0)
+@test zero(Dates.Month) == Dates.Month(0)
+@test zero(Dates.Month(10)) == Dates.Month(0)
+@test zero(Dates.Day) == Dates.Day(0)
+@test zero(Dates.Day(10)) == Dates.Day(0)
+@test zero(Dates.Hour) == Dates.Hour(0)
+@test zero(Dates.Hour(10)) == Dates.Hour(0)
+@test zero(Dates.Minute) == Dates.Minute(0)
+@test zero(Dates.Minute(10)) == Dates.Minute(0)
+@test zero(Dates.Second) == Dates.Second(0)
+@test zero(Dates.Second(10)) == Dates.Second(0)
+@test zero(Dates.Millisecond) == Dates.Millisecond(0)
+@test zero(Dates.Millisecond(10)) == Dates.Millisecond(0)
+@test one(Dates.Year) == Dates.Year(1)
+@test one(Dates.Year(10)) == Dates.Year(1)
+@test one(Dates.Month) == Dates.Month(1)
+@test one(Dates.Month(10)) == Dates.Month(1)
+@test one(Dates.Day) == Dates.Day(1)
+@test one(Dates.Day(10)) == Dates.Day(1)
+@test one(Dates.Hour) == Dates.Hour(1)
+@test one(Dates.Hour(10)) == Dates.Hour(1)
+@test one(Dates.Minute) == Dates.Minute(1)
+@test one(Dates.Minute(10)) == Dates.Minute(1)
+@test one(Dates.Second) == Dates.Second(1)
+@test one(Dates.Second(10)) == Dates.Second(1)
+@test one(Dates.Millisecond) == Dates.Millisecond(1)
+@test one(Dates.Millisecond(10)) == Dates.Millisecond(1)
+@test Dates.Year(-1) < Dates.Year(1)
+@test !(Dates.Year(-1) > Dates.Year(1))
+@test Dates.Year(1) == Dates.Year(1)
+@test_throws ArgumentError Dates.Year(1) == 1
+@test_throws ArgumentError 1 == Dates.Year(1)
+@test_throws ArgumentError Dates.Year(1) < 1
+@test_throws ArgumentError 1 < Dates.Year(1)
+@test Dates.Month(-1) < Dates.Month(1)
+@test !(Dates.Month(-1) > Dates.Month(1))
+@test Dates.Month(1) == Dates.Month(1)
+@test_throws ArgumentError Dates.Month(1) == 1
+@test_throws ArgumentError 1 == Dates.Month(1)
+@test_throws ArgumentError Dates.Month(1) < 1
+@test_throws ArgumentError 1 < Dates.Month(1)
+@test Dates.Day(-1) < Dates.Day(1)
+@test !(Dates.Day(-1) > Dates.Day(1))
+@test Dates.Day(1) == Dates.Day(1)
+@test_throws ArgumentError Dates.Day(1) == 1
+@test_throws ArgumentError 1 == Dates.Day(1)
+@test_throws ArgumentError Dates.Day(1) < 1
+@test_throws ArgumentError 1 < Dates.Day(1)
+@test Dates.Hour(-1) < Dates.Hour(1)
+@test !(Dates.Hour(-1) > Dates.Hour(1))
+@test Dates.Hour(1) == Dates.Hour(1)
+@test_throws ArgumentError Dates.Hour(1) == 1
+@test_throws ArgumentError 1 == Dates.Hour(1)
+@test_throws ArgumentError Dates.Hour(1) < 1
+@test_throws ArgumentError 1 < Dates.Hour(1)
+@test Dates.Minute(-1) < Dates.Minute(1)
+@test !(Dates.Minute(-1) > Dates.Minute(1))
+@test Dates.Minute(1) == Dates.Minute(1)
+@test_throws ArgumentError Dates.Minute(1) == 1
+@test_throws ArgumentError 1 == Dates.Minute(1)
+@test_throws ArgumentError Dates.Minute(1) < 1
+@test_throws ArgumentError 1 < Dates.Minute(1)
+@test Dates.Second(-1) < Dates.Second(1)
+@test !(Dates.Second(-1) > Dates.Second(1))
+@test Dates.Second(1) == Dates.Second(1)
+@test_throws ArgumentError Dates.Second(1) == 1
+@test_throws ArgumentError 1 == Dates.Second(1)
+@test_throws ArgumentError Dates.Second(1) < 1
+@test_throws ArgumentError 1 < Dates.Second(1)
+@test Dates.Millisecond(-1) < Dates.Millisecond(1)
+@test !(Dates.Millisecond(-1) > Dates.Millisecond(1))
+@test Dates.Millisecond(1) == Dates.Millisecond(1)
+@test_throws ArgumentError Dates.Millisecond(1) == 1
+@test_throws ArgumentError 1 == Dates.Millisecond(1)
+@test_throws ArgumentError Dates.Millisecond(1) < 1
+@test_throws ArgumentError 1 < Dates.Millisecond(1)
+@test_throws ArgumentError Dates.Year(1) < Dates.Millisecond(1)
+@test_throws ArgumentError Dates.Year(1) == Dates.Millisecond(1)
+
+# Ranges
+a = Dates.Date(2013,1,1)
+b = Dates.Date(2013,2,1)
+dr = a:b
+@test size(dr) == (32,)
+@test length(dr) == 32
+@test findin(dr,dr) == [1:32]
+@test findin(a:Dates.Date(2013,1,14),dr) == [1:14]
+@test findin(a:Dates.Date(2012,12,31),dr) == Int64[]
+@test isempty(a:Dates.Date(2012,12,31))
+@test reverse(dr) == b:Dates.Day(-1):a
+@test map!(x->x+Dates.Day(1),Array(Date,32),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
+@test map(x->x+Dates.Day(1),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
+@test minimum(dr) == a
+@test maximum(dr) == b
+for (i,d) in enumerate(dr)
+    @test d == a + Dates.Day(i-1)
+end
+for (i,d) in enumerate(a:Dates.Day(2):b)
+    @test d == a + Dates.Day((i-1)*2)
+end
+@test_throws MethodError dr + 1
+@test a in dr
+@test b in dr
+@test Dates.Date(2013,1,3) in dr
+@test Dates.Date(2013,1,15) in dr
+@test Dates.Date(2013,1,26) in dr
+@test !(Dates.Date(2012,1,1) in dr)
+@test !(a in a:Dates.Date(2012,12,31)) #empty range
+@test sort(dr) == dr
+@test issorted(dr)
+@test !issorted(reverse(dr))
+@test sort(reverse(dr)) == dr
+# dr + Dates.Day(1) #may just define in package
+@test length(b:Dates.Day(-1):a) == 32
+@test length(b:a) == 0
+@test length(b:Dates.Day(1):a) == 0
+@test length(a:Dates.Day(2):b) == 16
+@test last(a:Dates.Day(2):b) == Dates.Date(2013,1,31)
+@test length(a:Dates.Day(7):b) == 5
+@test last(a:Dates.Day(7):b) == Dates.Date(2013,1,29)
+@test length(a:Dates.Day(32):b) == 1
+@test last(a:Dates.Day(32):b) == Dates.Date(2013,1,1)
+@test (a:b)[1] == Dates.Date(2013,1,1)
+@test (a:b)[2] == Dates.Date(2013,1,2)
+@test (a:b)[7] == Dates.Date(2013,1,7)
+@test (a:b)[end] == b
+
+c = Dates.Date(2013,6,1)
+@test length(a:Dates.Month(1):c) == 6
+@test [a:Dates.Month(1):c] == [a + Dates.Month(i) for i in 0:5]
+
+#Date-Year/Month/Week/Day, near 0, big, really small
+#DateTime-Year/Month/Week/Day/Hour/Minute/Second/Millisecond
+#intersect
+#Period ranges
