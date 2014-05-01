@@ -30,15 +30,15 @@ Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
 
 (-){P<:Period}(x::P) = P(-value(x))
-Base.isless {P<:Period}(x::P,y::P) = isless(value(x),value(y))
-Base.isequal{P<:Period}(x::P,y::P) = isequal(value(x),value(y))
-Base.isless {R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
-Base.isequal{R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
-Base.isless {R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
-Base.isequal{R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
+<{P<:Period}(x::P,y::P) = <(value(x),value(y))
+=={P<:Period}(x::P,y::P) = ==(value(x),value(y))
+< {R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
+=={R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
+< {R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
+=={R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
 
-Base.isless(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
-Base.isequal(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
+<(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
+==(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
 
 #Period Arithmetic:
 import Base.div
@@ -119,9 +119,17 @@ to_days(x::Month) = itrunc(value(x)*30.436875)
 to_days(x::Week) = value(x)*7
 to_days(x::Day) = value(x)
 
-function Base.length{P<:Period}(r::StepRange{Date,P})
-    n = integer(div(r.stop+r.step - r.start, to_days(r.step)))
-    isempty(r) ? zero(n) : n
+function Base.length{T<:TimeType,P<:Period}(r::StepRange{T,P})
+    r.start > r.stop && r.step == one(r.step) && return 0
+    start,stop = r.start > r.stop ? (r.stop,r.start) : (r.start,r.stop)
+    step = r.step < oftype(r.step,0) ? -r.step : r.step
+    t = start
+    len = 1
+    while (t+step) <= stop
+        t += step
+        len += 1
+    end
+    return len
 end
 
 to_ms(x::Year) = itrunc(value(x)*365.2425*86400000.0)
@@ -133,10 +141,10 @@ to_ms(x::Minute) = value(x)*60000
 to_ms(x::Second) = value(x)*1000
 to_ms(x::Millisecond) = value(x)
 
-function Base.length{T<:DateTime,P<:Period}(r::StepRange{T,P})
+#=function Base.length{T<:DateTime,P<:Period}(r::StepRange{T,P})
     n = integer(div(r.stop+r.step - r.start, to_ms(r.step)))
     isempty(r) ? zero(n) : n
-end
+end=#
 
 # Given a start and stop date, calculate the difference between
 # the given stop date and the last valid date given the Period step
@@ -145,6 +153,8 @@ Base.steprem(a::Date,b::Date,c::Day) = (b-a) % c
 Base.steprem(a::DateTime,b::DateTime,c::Millisecond) = (b-a) % c
 
 function Base.steprem(start::TimeType,stop::TimeType,step::Period)
+    start,stop = start > stop ? (stop,start) : (start,stop)
+    step = step < oftype(step,0) ? -step : step
     t = start
     while (t+step) <= stop
         t += step
@@ -161,3 +171,5 @@ function in{T<:TimeType,S<:Period}(x, r::StepRange{T,S})
     end
     return false
 end
+
+# Need intersect

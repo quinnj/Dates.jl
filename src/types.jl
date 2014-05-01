@@ -120,7 +120,6 @@ Base.div{P<:Period}(::Millisecond,::P) = zero(P)=#
 # IO work: more robust, better, quicker errors, tests, test, tests...
 # Period conversions?
 # more work on recur
-# perf.jl
 # docs
 
 # Longer term

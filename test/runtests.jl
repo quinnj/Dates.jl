@@ -1388,9 +1388,28 @@ end
 @test (a:b)[7] == Dates.Date(2013,1,7)
 @test (a:b)[end] == b
 
+
 c = Dates.Date(2013,6,1)
 @test length(a:Dates.Month(1):c) == 6
 @test [a:Dates.Month(1):c] == [a + Dates.Month(i) for i in 0:5]
+[Dates.Date(2013,1,1):Dates.Month(2):Dates.Date(2013,1,2)]
+[c:Dates.Month(-1):a] == reverse([a:Dates.Month(1):c])
+
+length(a:Dates.Year(1):Dates.Date(2020,1,1)) == 8
+length(a:Dates.Year(1):Dates.Date(2020,2,1)) == 8
+length(a:Dates.Year(1):Dates.Date(2020,6,1)) == 8
+length(a:Dates.Year(1):Dates.Date(2020,11,1)) == 8
+length(a:Dates.Year(1):Dates.Date(2020,12,31)) == 8
+length(a:Dates.Year(1):Dates.Date(2021,1,1)) == 9
+length(Dates.Date(2000):Dates.Year(-10):Dates.Date(1900)) == 11
+length(Dates.Date(2000,6,23):Dates.Year(-10):Dates.Date(1900,2,28)) == 11
+length(Dates.Date(2000,1,1):Dates.Year(1):Dates.Date(2000,2,1)) == 1
+
+
+length(Dates.Year(1):Dates.Year(10)) == 10
+length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
+length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
+
 
 #Date-Year/Month/Week/Day, near 0, big, really small
 #DateTime-Year/Month/Week/Day/Hour/Minute/Second/Millisecond
