@@ -1392,23 +1392,36 @@ end
 c = Dates.Date(2013,6,1)
 @test length(a:Dates.Month(1):c) == 6
 @test [a:Dates.Month(1):c] == [a + Dates.Month(i) for i in 0:5]
-[Dates.Date(2013,1,1):Dates.Month(2):Dates.Date(2013,1,2)]
-[c:Dates.Month(-1):a] == reverse([a:Dates.Month(1):c])
+@test [a:Dates.Month(2):Dates.Date(2013,1,2)] == [a]
+@test [c:Dates.Month(-1):a] == reverse([a:Dates.Month(1):c])
 
-length(a:Dates.Year(1):Dates.Date(2020,1,1)) == 8
-length(a:Dates.Year(1):Dates.Date(2020,2,1)) == 8
-length(a:Dates.Year(1):Dates.Date(2020,6,1)) == 8
-length(a:Dates.Year(1):Dates.Date(2020,11,1)) == 8
-length(a:Dates.Year(1):Dates.Date(2020,12,31)) == 8
-length(a:Dates.Year(1):Dates.Date(2021,1,1)) == 9
-length(Dates.Date(2000):Dates.Year(-10):Dates.Date(1900)) == 11
-length(Dates.Date(2000,6,23):Dates.Year(-10):Dates.Date(1900,2,28)) == 11
-length(Dates.Date(2000,1,1):Dates.Year(1):Dates.Date(2000,2,1)) == 1
+d = Dates.Date(2020,1,1)
+@test length(a:Dates.Year(1):d) == 8
+@test first(a:Dates.Year(1):d) == a
+@test last(a:Dates.Year(1):d) == d
+@test length(a:Dates.Month(12):d) == 8
+@test first(a:Dates.Month(12):d) == a
+@test last(a:Dates.Month(12):d) == d
+@test length(a:Dates.Week(52):d) == 8
+@test first(a:Dates.Week(52):d) == a
+@test last(a:Dates.Week(52):d) == Dates.Date(2019,12,24)
+@test length(a:Dates.Day(365):d) == 8
+@test first(a:Dates.Day(365):d) == a
+@test last(a:Dates.Day(365):d) == Dates.Date(2019,12,31)
+
+@test length(a:Dates.Year(1):Dates.Date(2020,2,1)) == 8
+@test length(a:Dates.Year(1):Dates.Date(2020,6,1)) == 8
+@test length(a:Dates.Year(1):Dates.Date(2020,11,1)) == 8
+@test length(a:Dates.Year(1):Dates.Date(2020,12,31)) == 8
+@test length(a:Dates.Year(1):Dates.Date(2021,1,1)) == 9
+@test length(Dates.Date(2000):Dates.Year(-10):Dates.Date(1900)) == 11
+@test length(Dates.Date(2000,6,23):Dates.Year(-10):Dates.Date(1900,2,28)) == 11
+@test length(Dates.Date(2000,1,1):Dates.Year(1):Dates.Date(2000,2,1)) == 1
 
 
-length(Dates.Year(1):Dates.Year(10)) == 10
-length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
-length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
+@test length(Dates.Year(1):Dates.Year(10)) == 10
+@test length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
+@test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
 
 
 #Date-Year/Month/Week/Day, near 0, big, really small

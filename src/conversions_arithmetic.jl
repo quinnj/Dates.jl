@@ -1,7 +1,7 @@
 const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00 UTC
 function unix2date(x)
     rata = UNIXEPOCH + int64(1000*x)
-    return UTDateTime(UTM(rata))
+    return DateTime(UTM(rata))
 end
 # Returns unix seconds since 1970-01-01T00:00:00 UTC
 date2unix(dt::DateTime) = (value(dt) - UNIXEPOCH)/1000.0
@@ -14,21 +14,21 @@ date2ratadays(dt::TimeType) = _days(dt)
 const JULIANEPOCH = value(DateTime(-4713,11,24,12))
 function julian2date(f)
     rata = JULIANEPOCH + int64(86400000*f)
-    return UTDateTime(UTM(rata))
+    return DateTime(UTM(rata))
 end
 # Returns # of julian days since -4713-11-24T12:00:00 UTC
 date2julian(dt::DateTime) = (value(dt) - JULIANEPOCH)/86400000.0
 
 # Instant arithmetic
 for op in (:+,:*,:%,:/)
-    @eval ($op)(x::Instant,y::Instant) = error("Operation not defined for Instants")
+    @eval ($op)(x::Instant,y::Instant) = throw(ArgumentError("Operation not defined for Instants"))
 end
 (+)(x::Instant) = x
 (-){T<:Instant}(x::T,y::T) = x.periods - y.periods
 
 # DateTime arithmetic
 for op in (:+,:*,:%,:/)
-    @eval ($op)(x::TimeType,y::TimeType) = error("Operation not defined for TimeTypes")
+    @eval ($op)(x::TimeType,y::TimeType) = throw(ArgumentError("Operation not defined for TimeTypes"))
 end
 (+)(x::TimeType) = x
 (-){T<:TimeType}(x::T,y::T) = x.instant - y.instant
@@ -85,18 +85,18 @@ end
 (-)(x::Date,y::Week) = return Date(UTD(value(x) - 7*value(y)))
 (+)(x::Date,y::Day)  = return Date(UTD(value(x) + y))
 (-)(x::Date,y::Day)  = return Date(UTD(value(x) - y))
-(+)(x::DateTime,y::Week)   = return UTDateTime(UTM(value(x)+604800000*value(y)))
-(-)(x::DateTime,y::Week)   = return UTDateTime(UTM(value(x)-604800000*value(y)))
-(+)(x::DateTime,y::Day)    = return UTDateTime(UTM(value(x)+86400000 *value(y)))
-(-)(x::DateTime,y::Day)    = return UTDateTime(UTM(value(x)-86400000 *value(y)))
-(+)(x::DateTime,y::Hour)   = return UTDateTime(UTM(value(x)+3600000  *value(y)))
-(-)(x::DateTime,y::Hour)   = return UTDateTime(UTM(value(x)-3600000  *value(y)))
-(+)(x::DateTime,y::Minute) = return UTDateTime(UTM(value(x)+60000    *value(y)))
-(-)(x::DateTime,y::Minute) = return UTDateTime(UTM(value(x)-60000    *value(y)))
-(+)(x::DateTime,y::Second)      = return UTDateTime(UTM(value(x)+1000*value(y)))
-(-)(x::DateTime,y::Second)      = return UTDateTime(UTM(value(x)-1000*value(y)))
-(+)(x::DateTime,y::Millisecond) = return UTDateTime(UTM(value(x)+value(y)))
-(-)(x::DateTime,y::Millisecond) = return UTDateTime(UTM(value(x)-value(y)))
+(+)(x::DateTime,y::Week)   = return DateTime(UTM(value(x)+604800000*value(y)))
+(-)(x::DateTime,y::Week)   = return DateTime(UTM(value(x)-604800000*value(y)))
+(+)(x::DateTime,y::Day)    = return DateTime(UTM(value(x)+86400000 *value(y)))
+(-)(x::DateTime,y::Day)    = return DateTime(UTM(value(x)-86400000 *value(y)))
+(+)(x::DateTime,y::Hour)   = return DateTime(UTM(value(x)+3600000  *value(y)))
+(-)(x::DateTime,y::Hour)   = return DateTime(UTM(value(x)-3600000  *value(y)))
+(+)(x::DateTime,y::Minute) = return DateTime(UTM(value(x)+60000    *value(y)))
+(-)(x::DateTime,y::Minute) = return DateTime(UTM(value(x)-60000    *value(y)))
+(+)(x::DateTime,y::Second)      = return DateTime(UTM(value(x)+1000*value(y)))
+(-)(x::DateTime,y::Second)      = return DateTime(UTM(value(x)-1000*value(y)))
+(+)(x::DateTime,y::Millisecond) = return DateTime(UTM(value(x)+value(y)))
+(-)(x::DateTime,y::Millisecond) = return DateTime(UTM(value(x)-value(y)))
 (+)(y::Period,x::TimeType) = x + y
 (-)(y::Period,x::TimeType) = x - y
 

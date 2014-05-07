@@ -59,12 +59,15 @@ abstract TimeType <: AbstractTime
 # A DateTime type couples an Instant type with a Calendar type
 # to provide convenient human-conversion rules carried out
 # by multiple dispatch.
-immutable DateTime{T<:Instant,C<:Calendar} <: TimeType
+immutable Timestamp{T<:Instant,C<:Calendar} <: TimeType
     instant::T
-    DateTime(x::T) = new(x)
-end 
+    Timestamp(x::T) = new(x)
+end
 
-typealias UTDateTime DateTime{UTInstant{Millisecond},ISOCalendar}
+immutable DateTime <: TimeType
+    instant::UTInstant{Millisecond}
+    DateTime(x::UTInstant{Millisecond}) = new(x)
+end 
 
 immutable Date <: TimeType
     instant::UTInstant{Day}
@@ -85,7 +88,7 @@ function DateTime(y::Int64,m::Int64=1,d::Int64=1,
                   h::Int64=0,mi::Int64=0,s::Int64=0,ms::Int64=0)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
     rata = ms + 1000*(s + 60mi + 3600h + 86400*totaldays(y,m,d))
-    return UTDateTime(UTM(rata))
+    return DateTime(UTM(rata))
 end
 function Date(y::Int64,m::Int64=1,d::Int64=1)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
@@ -108,20 +111,3 @@ Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y[,m,d
 _c(x) = convert(Int64,x)
 DateTime(y,m=1,d=1,h=0,mi=0,s=0,ms=0) = DateTime(_c(y),_c(m),_c(d),_c(h),_c(mi),_c(s),_c(ms))
 Date(y,m=1,d=1) = Date(_c(y),_c(m),_c(d))
-
-# Custom 2-arg colon constructor for DateTime
-# otherwise, the default step would be Millisecond(1)
-#=Base.colon{T<:DateTime}(start::T, stop::T) = Base.StepRange(start, Day(1), stop)
-Base.rem{P<:Period}(::Millisecond,::P) = zero(P)
-Base.div{P<:Period}(::Millisecond,::P) = zero(P)=#
-
-
-# Range tests
-# IO work: more robust, better, quicker errors, tests, test, tests...
-# Period conversions?
-# more work on recur
-# docs
-
-# Longer term
- # Timezone parameter to DateTime?
- # Timezone.jl package

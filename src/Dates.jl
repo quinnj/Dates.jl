@@ -5,6 +5,7 @@ export Calendar, ISOCalendar,
     Period, Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
     # accessors
     year, month, week, day, hour, minute, second, millisecond,
+    yearmonth, monthday, yearmonthday,
     # conversions
     ratadays2date, date2ratadays, unix2date, date2unix, julian2date, date2julian,
     # date functions

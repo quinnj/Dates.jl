@@ -68,7 +68,7 @@ yearmonthday(dt::TimeType) = _day2date(_days(dt))
 # Conversion/Promotion
 Date(dt::TimeType) = convert(Date,dt)
 DateTime(dt::TimeType) = convert(DateTime,dt)
-Base.convert{D<:DateTime}(::Type{D},dt::Date) = UTDateTime(UTM(value(dt)*86400000))
+Base.convert(::Type{DateTime},dt::Date) = DateTime(UTM(value(dt)*86400000))
 Base.convert(::Type{Date},dt::DateTime) = Date(UTD(div(value(dt),86400000)))
 Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
 Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
@@ -77,24 +77,21 @@ Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 @vectorize_1arg Date DateTime
 
 # Traits, Equality
-Base.hash(dt::TimeType) = hash(value(dt))
 Base.isfinite{T<:TimeType}(::Union(TimeType,T)) = true
-calendar{P,C}(dt::DateTime{P,C}) = C
+calendar(dt::DateTime) = ISOCalendar
 calendar(dt::Date) = ISOCalendar
-Base.precision{P,C}(dt::DateTime{P,C}) = P
+Base.precision(dt::DateTime) = UTInstant{Millisecond}
 Base.precision(dt::Date) = UTInstant{Day}
-Base.typemax{T<:DateTime}(::Type{T}) = DateTime(292277024,12,31,23,59,59)
-Base.typemin{T<:DateTime}(::Type{T}) = DateTime(-292277023,1,1,0,0,0)
+Base.typemax(::Type{DateTime}) = DateTime(292277024,12,31,23,59,59)
+Base.typemin(::Type{DateTime}) = DateTime(-292277023,1,1,0,0,0)
 Base.typemax(::Type{Date}) = Date(252522163911149,12,31)
 Base.typemin(::Type{Date}) = Date(-252522163911150,1,1)
-# Date-DateTime promotion/isless/isequal
-Base.promote_rule{D<:DateTime}(::Type{Date},::Type{D}) = D
-Base.isless(x::Date,y::Date) = isless(value(x),value(y))
-Base.isless{D<:DateTime}(x::D,y::D) = isless(value(x),value(y))
-Base.isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
-Base.isequal(x::Date,y::Date) = isequal(value(x),value(y))
-Base.isequal{D<:DateTime}(x::D,y::D) = isequal(value(x),value(y))
-Base.isequal(x::TimeType,y::TimeType) = isequal(promote(x,y)...)
+# Date-DateTime promotion, <, ==
+Base.promote_rule(::Type{Date},x::Type{DateTime}) = x
+<(x::Date,y::Date) = <(value(x),value(y))
+<(x::DateTime,y::DateTime) = <(value(x),value(y))
+<(x::TimeType,y::TimeType) = <(promote(x,y)...)
+==(x::TimeType,y::TimeType) = ===(promote(x,y)...)
 
 # TODO: optimize this
 function Base.string(dt::DateTime)
@@ -169,11 +166,14 @@ dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 :
     d < 15 ? 2 : d < 22 ? 3 : d < 29 ? 4 : 5)
 # Total number of a day of week in the month
 # i.e. are there 4 or 5 Mondays in this month?
+const TWENTYNINE = IntSet(1,8,15,22,29)
+const THIRTY = IntSet(1,2,8,9,15,16,22,23,29,30)
+const THIRTYONE = IntSet(1,2,3,8,9,10,15,16,17,22,23,24,29,30,31)
 function daysofweekinmonth(dt::TimeType)
     d,ld = day(dt),lastdayofmonth(dt)
-    return ld == 28 ? 4 : ld == 29 ? ((d in [1,8,15,22,29]) ? 5 : 4) :
-           ld == 30 ? ((d in [1,2,8,9,15,16,22,23,29,30]) ? 5 : 4) :
-           (d in [1,2,3,8,9,10,15,16,17,22,23,24,29,30,31]) ? 5 : 4
+    return ld == 28 ? 4 : ld == 29 ? ((d in TWENTYNINE) ? 5 : 4) :
+           ld == 30 ? ((d in THIRTY) ? 5 : 4) :
+           (d in THIRTYONE) ? 5 : 4
 end
 firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
 firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
