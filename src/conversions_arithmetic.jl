@@ -34,19 +34,19 @@ end
 (-){T<:TimeType}(x::T,y::T) = x.instant - y.instant
 
 function (+)(dt::DateTime,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = lastdayofmonth(ny,m)
+    oy,m,d = yearmonthday(dt); ny = oy+value(y); ld = daysinmonth(ny,m)
     return DateTime(ny,m,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (+)(dt::Date,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy+value(y); ld = lastdayofmonth(ny,m)
+    oy,m,d = yearmonthday(dt); ny = oy+value(y); ld = daysinmonth(ny,m)
     return Date(ny,m,d <= ld ? d : ld)
 end
 function (-)(dt::DateTime,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = lastdayofmonth(ny,m)
+    oy,m,d = yearmonthday(dt); ny = oy-value(y); ld = daysinmonth(ny,m)
     return DateTime(ny,m,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (-)(dt::Date,y::Year)
-    oy,m,d = _day2date(_days(dt)); ny = oy-value(y); ld = lastdayofmonth(ny,m)
+    oy,m,d = yearmonthday(dt); ny = oy-value(y); ld = daysinmonth(ny,m)
     return Date(ny,m,d <= ld ? d : ld)
 end
 
@@ -58,27 +58,27 @@ monthwrap(m1,m2) = (v = mod1(m1+m2,12); return v < 0 ? 12 + v : v)
 yearwrap(y,m1,m2) = y + fld(m1 + m2 - 1,12)
 
 function (+)(dt::DateTime,z::Month) 
-    y,m,d = _day2date(_days(dt))
+    y,m,d = yearmonthday(dt)
     ny = yearwrap(y,m,value(z))
-    mm = monthwrap(m,value(z)); ld = lastdayofmonth(ny,mm)
+    mm = monthwrap(m,value(z)); ld = daysinmonth(ny,mm)
     return DateTime(ny,mm,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (+)(dt::Date,z::Month) 
-    y,m,d = _day2date(_days(dt))
+    y,m,d = yearmonthday(dt)
     ny = yearwrap(y,m,value(z))
-    mm = monthwrap(m,value(z)); ld = lastdayofmonth(ny,mm)
+    mm = monthwrap(m,value(z)); ld = daysinmonth(ny,mm)
     return Date(ny,mm,d <= ld ? d : ld)
 end
 function (-)(dt::DateTime,z::Month) 
-    y,m,d = _day2date(_days(dt))
+    y,m,d = yearmonthday(dt)
     ny = yearwrap(y,m,-value(z))
-    mm = monthwrap(m,-value(z)); ld = lastdayofmonth(ny,mm)
+    mm = monthwrap(m,-value(z)); ld = daysinmonth(ny,mm)
     return DateTime(ny,mm,d <= ld ? d : ld,hour(dt),minute(dt),second(dt))
 end
 function (-)(dt::Date,z::Month) 
-    y,m,d = _day2date(_days(dt))
+    y,m,d = yearmonthday(dt)
     ny = yearwrap(y,m,-value(z))
-    mm = monthwrap(m,-value(z)); ld = lastdayofmonth(ny,mm)
+    mm = monthwrap(m,-value(z)); ld = daysinmonth(ny,mm)
     return Date(ny,mm,d <= ld ? d : ld)
 end
 (+)(x::Date,y::Week) = return Date(UTD(value(x) + 7*value(y)))

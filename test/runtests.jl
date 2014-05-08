@@ -43,7 +43,7 @@ function test_dates(from,to)
     test_day = Dates.totaldays(from,1,1)
     for y in from:to
         for m = 1:12
-            for d = 1:Dates.lastdayofmonth(y,m)
+            for d = 1:Dates.daysinmonth(y,m)
                 days = Dates.totaldays(y,m,d)
                 @test days == test_day
                 @test (y,m,d) == Dates._day2date(days)
@@ -55,7 +55,7 @@ end
 test_dates(-2000,2000)
 
 # Create "test" check manually
-test = Dates.UTDateTime(Dates.UTM(63492681600000))
+test = Dates.DateTime(Dates.UTM(63492681600000))
 # Test DateTime construction by parts
 @test Dates.DateTime(2013) == test
 @test Dates.DateTime(2013,1) == test
@@ -121,7 +121,7 @@ function test_dates()
     y = m = d = h = mi = 0
     for y in [-2013,-1,0,1,2013]
         for m = 1:12
-            for d = 1:Dates.lastdayofmonth(y,m)
+            for d = 1:Dates.daysinmonth(y,m)
                 for h = 0:23
                     for mi = 0:59
                         dt = Dates.DateTime(y,m,d,h,mi)
@@ -145,7 +145,7 @@ function test_dates()
     y = m = d = h = mi = s = ms = 0
     for y in [-2013,-1,0,1,2013]
         for m in [1,6,12]
-            for d in [1,15,Dates.lastdayofmonth(y,m)]
+            for d in [1,15,Dates.daysinmonth(y,m)]
                 for h in [0,12,23]
                     for s = 0:59
                         for ms in [0,1,500,999]
@@ -169,7 +169,7 @@ function test_dates(from,to)
     y = m = d = 0
     for y in from:to
         for m = 1:12
-            for d = 1:Dates.lastdayofmonth(y,m)
+            for d = 1:Dates.daysinmonth(y,m)
                 dt = Dates.Date(y,m,d)
                 @test y == Dates.year(dt)
                 @test m == Dates.month(dt)
@@ -615,14 +615,14 @@ b = Dates.Date(2000)
 @test !(b < a)
 c = Dates.DateTime(2000)
 d = Dates.Date(2000)
-@test isequal(a,c)
-@test isequal(c,a)
-@test isequal(d,b)
-@test isequal(b,d)
-@test isequal(a,d)
-@test isequal(d,a)
-@test isequal(b,c)
-@test isequal(c,b)
+@test ==(a,c)
+@test ==(c,a)
+@test ==(d,b)
+@test ==(b,d)
+@test ==(a,d)
+@test ==(d,a)
+@test ==(b,c)
+@test ==(c,b)
 b = Dates.Date(2001)
 @test b > a
 @test a < b
@@ -724,19 +724,19 @@ dec = Dates.DateTime(2013,12,11) #Wednesday
 @test Dates.firstdayofmonth(Date(nov)) == Date(2013,11,1)
 @test Dates.firstdayofmonth(Date(dec)) == Date(2013,12,1)
 
-@test Dates.lastdayofmonth(2000,1) == 31
-@test Dates.lastdayofmonth(2000,2) == 29
-@test Dates.lastdayofmonth(2000,3) == 31
-@test Dates.lastdayofmonth(2000,4) == 30
-@test Dates.lastdayofmonth(2000,5) == 31
-@test Dates.lastdayofmonth(2000,6) == 30
-@test Dates.lastdayofmonth(2000,7) == 31
-@test Dates.lastdayofmonth(2000,8) == 31
-@test Dates.lastdayofmonth(2000,9) == 30
-@test Dates.lastdayofmonth(2000,10) == 31
-@test Dates.lastdayofmonth(2000,11) == 30
-@test Dates.lastdayofmonth(2000,12) == 31
-@test Dates.lastdayofmonth(2001,2) == 28
+@test Dates.daysinmonth(2000,1) == 31
+@test Dates.daysinmonth(2000,2) == 29
+@test Dates.daysinmonth(2000,3) == 31
+@test Dates.daysinmonth(2000,4) == 30
+@test Dates.daysinmonth(2000,5) == 31
+@test Dates.daysinmonth(2000,6) == 30
+@test Dates.daysinmonth(2000,7) == 31
+@test Dates.daysinmonth(2000,8) == 31
+@test Dates.daysinmonth(2000,9) == 30
+@test Dates.daysinmonth(2000,10) == 31
+@test Dates.daysinmonth(2000,11) == 30
+@test Dates.daysinmonth(2000,12) == 31
+@test Dates.daysinmonth(2001,2) == 28
 
 @test Dates.isleap(Dates.DateTime(1900)) == false
 @test Dates.isleap(Dates.DateTime(2000)) == true
@@ -1428,3 +1428,7 @@ d = Dates.Date(2020,1,1)
 #DateTime-Year/Month/Week/Day/Hour/Minute/Second/Millisecond
 #intersect
 #Period ranges
+
+#TODO
+ #make DateTime UTInstant{Millisecond}, just timezone parameter (implicit Calendar)
+ #make TimeStamp fully parameterized (Instant, TimeZone, Calendar)

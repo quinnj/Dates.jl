@@ -44,7 +44,7 @@ UTD(x) = UTInstant(Day(x))
 
 # Calendar types provide dispatch rules for interpretating instant 
 # timelines in human-readable form. Calendar types are used as
-# type tags in the DateTime type for dispatching to methods
+# type tags in the Timestamp type for dispatching to methods
 # implementing the Instant=>Human-Form conversion rules.
 abstract Calendar <: AbstractTime
 
@@ -56,7 +56,7 @@ immutable ISOCalendar <: Calendar end
 # TimeTypes wrap Instants to provide human representations of time
 abstract TimeType <: AbstractTime
 
-# A DateTime type couples an Instant type with a Calendar type
+# A Timestamp type couples an Instant type with a Calendar type
 # to provide convenient human-conversion rules carried out
 # by multiple dispatch.
 immutable Timestamp{T<:Instant,C<:Calendar} <: TimeType
@@ -64,21 +64,27 @@ immutable Timestamp{T<:Instant,C<:Calendar} <: TimeType
     Timestamp(x::T) = new(x)
 end
 
+# DateTime is a millisecond precision UTInstant interpreted thru ISOCalendar
 immutable DateTime <: TimeType
     instant::UTInstant{Millisecond}
     DateTime(x::UTInstant{Millisecond}) = new(x)
 end 
 
+# DateTime is a day precision UTInstant interpreted thru ISOCalendar
 immutable Date <: TimeType
     instant::UTInstant{Day}
     Date(x::UTInstant{Day}) = new(x)
 end
 
 # Convert y,m,d to # of Rata Die days
+# Works by shifting the beginning of the year to March 1,
+# so a leap day is the very last day of the year
 const MONTHDAYS = Int64[306,337,0,31,61,92,122,153,184,214,245,275]
 function totaldays(y,m,d)
+    # If we're in Jan/Feb, shift the given year back one
     z = m < 3 ? y - 1 : y
     mdays = MONTHDAYS[m]::Int64
+    # days + month_days + year_days
     return d + mdays + 365z + fld(z,4) - fld(z,100) + fld(z,400) - 306
 end
 

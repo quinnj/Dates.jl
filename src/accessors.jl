@@ -65,6 +65,10 @@ yearmonthday(dt::TimeType) = _day2date(_days(dt))
 @vectorize_1arg DateTime second
 @vectorize_1arg DateTime millisecond
 
+@vectorize_1arg TimeType yearmonth
+@vectorize_1arg TimeType monthday
+@vectorize_1arg TimeType yearmonthday
+
 # Conversion/Promotion
 Date(dt::TimeType) = convert(Date,dt)
 DateTime(dt::TimeType) = convert(DateTime,dt)
@@ -139,24 +143,29 @@ monthabbr(dt::TimeType) = MONTHSABBR[month(dt)]
 dayname(dt::TimeType) = DAYSOFWEEK[dayofweek(dt)]
 dayabbr(dt::TimeType) = DAYSOFWEEKABBR[dayofweek(dt)]
 
+# Core date functions
 const DAYSINMONTH = Int64[31,28,31,30,31,30,31,31,30,31,30,31]
-_isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
-function lastdayofmonth(y,m)
+isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
+function daysinmonth(y,m)
     d = DAYSINMONTH[m]::Int64
-    return d + (m == 2 && _isleap(y))
+    return d + (m == 2 && isleap(y))
 end
-isleap(dt::TimeType) = _isleap(year(dt))
+
+isleap(dt::TimeType) = isleap(year(dt))
+daysinmonth(dt::TimeType) = daysinmonth(yearmonth(dt)...)
+#TODO: don't create new Date, compute offest in current month
 function lastdayofmonth(dt::Date) 
-    y,m,d = _day2date(_days(dt))
-    return Date(y,m,lastdayofmonth(y,m))
+    y,m = yearmonth(dt)
+    return Date(y,m,daysinmonth(y,m))
 end
 lastdayofmonth(dt::DateTime) = lastdayofmonth(Date(dt))
+#TODO: don't create new Date, compute offest in current month
 function firstdayofmonth(dt::Date)
-    y,m,d = _day2date(_days(dt))
+    y,m = yearmonth(dt)
     return Date(y,m,1)
 end
 function firstdayofmonth(dt::DateTime)
-    y,m,d = _day2date(_days(dt))
+    y,m = yearmonth(dt)
     return DateTime(y,m,1,0,0,0,0)
 end
 # Monday = 1....Sunday = 7
@@ -170,7 +179,8 @@ const TWENTYNINE = IntSet(1,8,15,22,29)
 const THIRTY = IntSet(1,2,8,9,15,16,22,23,29,30)
 const THIRTYONE = IntSet(1,2,3,8,9,10,15,16,17,22,23,24,29,30,31)
 function daysofweekinmonth(dt::TimeType)
-    d,ld = day(dt),lastdayofmonth(dt)
+    y,m,d = yearmonthday(dt)
+    ld = daysinmonth(y,m)
     return ld == 28 ? 4 : ld == 29 ? ((d in TWENTYNINE) ? 5 : 4) :
            ld == 30 ? ((d in THIRTY) ? 5 : 4) :
            (d in THIRTYONE) ? 5 : 4
@@ -182,6 +192,7 @@ lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
 dayofyear(dt::TimeType) = _days(dt) - totaldays(year(dt),1,1) + 1
 
 @vectorize_1arg TimeType isleap
+@vectorize_1arg TimeType daysinmonth
 @vectorize_1arg TimeType lastdayofmonth
 @vectorize_1arg TimeType dayofweek
 @vectorize_1arg TimeType dayofweekofmonth

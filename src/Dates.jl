@@ -10,7 +10,7 @@ export Calendar, ISOCalendar,
     ratadays2date, date2ratadays, unix2date, date2unix, julian2date, date2julian,
     # date functions
     monthname, monthabbr, dayname, dayabbr, now,
-    isleap, lastdayofmonth, firstdayofmonth, dayofweek, dayofyear,
+    isleap, daysinmonth, lastdayofmonth, firstdayofmonth, dayofweek, dayofyear,
     dayofweekofmonth, daysofweekinmonth, firstdayofweek, lastdayofweek,
     recur, calendar, precision, ISOFormat,
     # consts
