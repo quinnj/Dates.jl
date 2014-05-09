@@ -28,7 +28,6 @@ Base.one{P<:Period}(::Union(Type{P},P)) = P(1)
 Base.typemin{P<:Period}(::Type{P}) = P(typemin(Int64))
 Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
-
 (-){P<:Period}(x::P) = P(-value(x))
 <{P<:Period}(x::P,y::P) = <(value(x),value(y))
 =={P<:Period}(x::P,y::P) = ==(value(x),value(y))

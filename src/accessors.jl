@@ -73,7 +73,7 @@ yearmonthday(dt::TimeType) = _day2date(_days(dt))
 Date(dt::TimeType) = convert(Date,dt)
 DateTime(dt::TimeType) = convert(DateTime,dt)
 Base.convert(::Type{DateTime},dt::Date) = DateTime(UTM(value(dt)*86400000))
-Base.convert(::Type{Date},dt::DateTime) = Date(UTD(div(value(dt),86400000)))
+Base.convert(::Type{Date},dt::DateTime) = Date(UTD(_days(dt)))
 Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
 Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 
@@ -86,10 +86,10 @@ calendar(dt::DateTime) = ISOCalendar
 calendar(dt::Date) = ISOCalendar
 Base.precision(dt::DateTime) = UTInstant{Millisecond}
 Base.precision(dt::Date) = UTInstant{Day}
-Base.typemax(::Type{DateTime}) = DateTime(292277024,12,31,23,59,59)
-Base.typemin(::Type{DateTime}) = DateTime(-292277023,1,1,0,0,0)
-Base.typemax(::Type{Date}) = Date(252522163911149,12,31)
-Base.typemin(::Type{Date}) = Date(-252522163911150,1,1)
+Base.typemax(::Union(DateTime,Type{DateTime})) = DateTime(292277024,12,31,23,59,59)
+Base.typemin(::Union(DateTime,Type{DateTime})) = DateTime(-292277023,1,1,0,0,0)
+Base.typemax(::Union(Date,Type{Date})) = Date(252522163911149,12,31)
+Base.typemin(::Union(Date,Type{Date})) = Date(-252522163911150,1,1)
 # Date-DateTime promotion, <, ==
 Base.promote_rule(::Type{Date},x::Type{DateTime}) = x
 <(x::Date,y::Date) = <(value(x),value(y))
@@ -153,26 +153,34 @@ end
 
 isleap(dt::TimeType) = isleap(year(dt))
 daysinmonth(dt::TimeType) = daysinmonth(yearmonth(dt)...)
-#TODO: don't create new Date, compute offest in current month
+
 function lastdayofmonth(dt::Date) 
-    y,m = yearmonth(dt)
-    return Date(y,m,daysinmonth(y,m))
+    y,m,d = yearmonthday(dt)
+    return Date(UTD(value(dt)+daysinmonth(y,m)-d))
 end
-lastdayofmonth(dt::DateTime) = lastdayofmonth(Date(dt))
-#TODO: don't create new Date, compute offest in current month
-function firstdayofmonth(dt::Date)
-    y,m = yearmonth(dt)
-    return Date(y,m,1)
-end
-function firstdayofmonth(dt::DateTime)
-    y,m = yearmonth(dt)
-    return DateTime(y,m,1,0,0,0,0)
-end
+lastdayofmonth(dt::DateTime) = DateTime(lastdayofmonth(Date(dt)))
+
+firstdayofmonth(dt::Date) = Date(UTD(value(dt)-day(dt)+1))
+firstdayofmonth(dt::DateTime) = DateTime(firstdayofmonth(Date(dt)))
+
+firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
+firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
+lastdayofweek(dt::Date) = Date(UTD(value(dt) + (7-dayofweek(dt))))
+lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
+
 # Monday = 1....Sunday = 7
 dayofweek(dt::TimeType) = mod1(_days(dt),7)
+
+const MONTHDAYS2 = Int64[0,31,59,90,120,151,181,212,243,273,304,334]
+function dayofyear(dt::TimeType)
+    y,m,d = yearmonthday(dt)
+    return MONTHDAYS2[m] + d + (m > 2 && isleap(y))
+end
+
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
 dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
     d < 15 ? 2 : d < 22 ? 3 : d < 29 ? 4 : 5)
+
 # Total number of a day of week in the month
 # i.e. are there 4 or 5 Mondays in this month?
 const TWENTYNINE = IntSet(1,8,15,22,29)
@@ -185,11 +193,6 @@ function daysofweekinmonth(dt::TimeType)
            ld == 30 ? ((d in THIRTY) ? 5 : 4) :
            (d in THIRTYONE) ? 5 : 4
 end
-firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
-firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
-lastdayofweek(dt::Date) = Date(UTD(value(dt) + (7-dayofweek(dt))))
-lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
-dayofyear(dt::TimeType) = _days(dt) - totaldays(year(dt),1,1) + 1
 
 @vectorize_1arg TimeType isleap
 @vectorize_1arg TimeType daysinmonth

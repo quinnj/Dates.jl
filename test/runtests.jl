@@ -1341,7 +1341,7 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test_throws ArgumentError Dates.Year(1) == Dates.Millisecond(1)
 
 # Ranges
-a = Dates.Date(2013,1,1)
+#=a = Dates.Date(2013,1,1)
 b = Dates.Date(2013,2,1)
 dr = a:b
 @test size(dr) == (32,)
@@ -1421,7 +1421,7 @@ d = Dates.Date(2020,1,1)
 
 @test length(Dates.Year(1):Dates.Year(10)) == 10
 @test length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
-@test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
+@test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5=#
 
 
 #Date-Year/Month/Week/Day, near 0, big, really small
@@ -1430,5 +1430,9 @@ d = Dates.Date(2020,1,1)
 #Period ranges
 
 #TODO
- #make DateTime UTInstant{Millisecond}, just timezone parameter (implicit Calendar)
+ #work on ranges
+ #massage recur
+ #research JSR-310, PHP? javascript? go? C#?
+ #formatting/parsing
  #make TimeStamp fully parameterized (Instant, TimeZone, Calendar)
+  #have datetime field + nanosecond field?
