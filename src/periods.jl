@@ -111,9 +111,10 @@ function (+)(x::TimeType,y::CompoundPeriod)
 end
 (+)(x::CompoundPeriod,y::TimeType) = y + x
 
+#=
 # Date/DateTime Ranges
 # Given a start and end date, how many steps/periods are in between
-#=function Base.length{T<:TimeType,P<:Period}(r::StepRange{T,P})
+function Base.length{T<:TimeType,P<:Period}(r::StepRange{T,P})
     isempty(r) && return 0
     start,stop = r.start > r.stop ? (r.stop,r.start) : (r.start,r.stop)
     step = r.step < zero(r.step) ? -r.step : r.step
@@ -131,6 +132,14 @@ end
 # last = stop - steprem(start,stop,step)
 Base.steprem(a::Date,b::Date,c::Day) = (b-a) % c
 Base.steprem(a::DateTime,b::DateTime,c::Millisecond) = (b-a) % c
+function Base.steprem(start::TimeType,stop::TimeType,step::Period)
+    start,stop = start > stop ? (stop,start) : (start,stop)
+    t = start
+    while (t+step) <= stop
+        t += step
+    end
+    return t
+end
 
 
 
