@@ -25,5 +25,6 @@ include("accessors.jl")
 include("conversions_arithmetic.jl")
 include("io.jl")
 include("periods.jl")
+include("ranges.jl")
 
 end # module

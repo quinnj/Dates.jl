@@ -86,8 +86,8 @@ calendar(dt::DateTime) = ISOCalendar
 calendar(dt::Date) = ISOCalendar
 Base.precision(dt::DateTime) = UTInstant{Millisecond}
 Base.precision(dt::Date) = UTInstant{Day}
-Base.typemax(::Union(DateTime,Type{DateTime})) = DateTime(292277024,12,31,23,59,59)
-Base.typemin(::Union(DateTime,Type{DateTime})) = DateTime(-292277023,1,1,0,0,0)
+Base.typemax(::Union(DateTime,Type{DateTime})) = DateTime(146138512,12,31,23,59,59)
+Base.typemin(::Union(DateTime,Type{DateTime})) = DateTime(-146138511,1,1,0,0,0)
 Base.typemax(::Union(Date,Type{Date})) = Date(252522163911149,12,31)
 Base.typemin(::Union(Date,Type{Date})) = Date(-252522163911150,1,1)
 # Date-DateTime promotion, <, ==

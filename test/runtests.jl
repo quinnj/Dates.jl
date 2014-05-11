@@ -592,8 +592,9 @@ b = Dates.Date(2000)
 @test Dates.calendar(b) == Dates.ISOCalendar
 @test Dates.precision(a) == Dates.UTInstant{Millisecond}
 @test Dates.precision(b) == Dates.UTInstant{Day}
-@test string(typemax(Dates.DateTime)) == "292277024-12-31T23:59:59"
-@test string(typemin(Dates.DateTime)) == "-292277023-01-01T00:00:00"
+@test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59"
+@test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00"
+@test typemax(Dates.DateTime) - typemin(Dates.DateTime) == Dates.Millisecond(9223372017043199000)
 @test string(typemax(Dates.Date)) == "252522163911149-12-31"
 @test string(typemin(Dates.Date)) == "-252522163911150-01-01"
 @test convert(Real,b) == 730120
@@ -1341,7 +1342,7 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test_throws ArgumentError Dates.Year(1) == Dates.Millisecond(1)
 
 # Ranges
-#=a = Dates.Date(2013,1,1)
+a = Dates.Date(2013,1,1)
 b = Dates.Date(2013,2,1)
 dr = a:b
 @test size(dr) == (32,)
@@ -1361,19 +1362,22 @@ end
 for (i,d) in enumerate(a:Dates.Day(2):b)
     @test d == a + Dates.Day((i-1)*2)
 end
-@test_throws MethodError dr + 1
+@test_throws MethodError dr + 1 #TODO
 @test a in dr
 @test b in dr
 @test Dates.Date(2013,1,3) in dr
 @test Dates.Date(2013,1,15) in dr
 @test Dates.Date(2013,1,26) in dr
 @test !(Dates.Date(2012,1,1) in dr)
-@test !(a in a:Dates.Date(2012,12,31)) #empty range
+em = a:Dates.Date(2012,12,31)
+@test !(a in em) #empty range
 @test sort(dr) == dr
+@test sort(em) == em
 @test issorted(dr)
+@test issorted(em)
 @test !issorted(reverse(dr))
 @test sort(reverse(dr)) == dr
-# dr + Dates.Day(1) #may just define in package
+# dr + Dates.Day(1) #TODO
 @test length(b:Dates.Day(-1):a) == 32
 @test length(b:a) == 0
 @test length(b:Dates.Day(1):a) == 0
@@ -1387,7 +1391,26 @@ end
 @test (a:b)[2] == Dates.Date(2013,1,2)
 @test (a:b)[7] == Dates.Date(2013,1,7)
 @test (a:b)[end] == b
+@test first(a:Dates.Date(20000,1,1)) == a
+@test first(a:Dates.Date(200000,1,1)) == a
+@test first(a:Dates.Date(2000000,1,1)) == a
+@test first(a:Dates.Date(20000000,1,1)) == a
+@test first(a:Dates.Date(200000000,1,1)) == a
+@test first(a:typemax(Dates.Date)) == a
+@test first(typemin(Dates.Date):typemax(Dates.Date)) == typemin(Dates.Date)
+@test length(typemin(Dates.Date):Dates.Week(1):typemax(Dates.Date)) == 26351950414948059
+#toobig
+@test_throws ArgumentError length(typemin(Dates.Date):Dates.Month(1):typemax(Dates.Date))
+@test_throws ArgumentError length(typemin(Dates.Date):Dates.Year(1):typemax(Dates.Date))
+@test_throws ArgumentError length(typemin(Dates.DateTime):Dates.Month(1):typemax(Dates.DateTime))
+@test_throws ArgumentError length(typemin(Dates.DateTime):Dates.Year(1):typemax(Dates.DateTime))
 
+@test length(typemin(Dates.DateTime):Dates.Week(1):typemax(Dates.DateTime)) == 15250284420
+@test length(typemin(Dates.DateTime):Dates.Day(1):typemax(Dates.DateTime)) == 106751990938
+@test length(typemin(Dates.DateTime):Dates.Hour(1):typemax(Dates.DateTime)) == 2562047782512
+@test length(typemin(Dates.DateTime):Dates.Minute(1):typemax(Dates.DateTime)) == 153722866950720
+@test length(typemin(Dates.DateTime):Dates.Second(1):typemax(Dates.DateTime)) == 9223372017043200
+@test length(typemin(DateTime):typemax(DateTime)) == 9223372017043199001
 
 c = Dates.Date(2013,6,1)
 @test length(a:Dates.Month(1):c) == 6
@@ -1418,21 +1441,21 @@ d = Dates.Date(2020,1,1)
 @test length(Dates.Date(2000,6,23):Dates.Year(-10):Dates.Date(1900,2,28)) == 11
 @test length(Dates.Date(2000,1,1):Dates.Year(1):Dates.Date(2000,2,1)) == 1
 
-
 @test length(Dates.Year(1):Dates.Year(10)) == 10
 @test length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
-@test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5=#
-
-
-#Date-Year/Month/Week/Day, near 0, big, really small
-#DateTime-Year/Month/Week/Day/Hour/Minute/Second/Millisecond
-#intersect
-#Period ranges
+@test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
+@test_throws OverflowError length(typemin(Dates.Year):typemax(Dates.Year)) == 0
+@test_throws MethodError Dates.Date(0):Dates.DateTime(2000)
+@test_throws MethodError Dates.Date(0):Dates.Year(10)
+@test length(range(Dates.Date(2000),366)) == 366
+@test last(range(Dates.Date(2000),366)) == Dates.Date(2000,12,31)
+@test last(range(Dates.Date(2001),365)) == Dates.Date(2001,12,31)
+@test last(range(Dates.Date(2000),367)) == last(range(Dates.Date(2000),Dates.Month(12),2)) == last(range(Dates.Date(2000),Dates.Year(1),2))
+@test last(range(Dates.DateTime(2000),Dates.Day(366),2)) == last(range(Dates.DateTime(2000),Dates.Hour(8784),2))
 
 #TODO
- #work on ranges
  #massage recur
- #research JSR-310, PHP? javascript? go? C#?
+ #research JSR-310, PHP? javascript? go? C#? for API completeness
  #formatting/parsing
  #make TimeStamp fully parameterized (Instant, TimeZone, Calendar)
   #have datetime field + nanosecond field?
