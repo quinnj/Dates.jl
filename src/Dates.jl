@@ -22,10 +22,11 @@ export Calendar, ISOCalendar,
     Jan,Feb,Mar,Apr,Jun,Jul,Aug,Sep,Oct,Nov,Dec
 
 include("types.jl")
+include("periods.jl")
 include("accessors.jl")
 include("query.jl")
-include("conversions_arithmetic.jl")
-include("periods.jl")
+include("arithmetic.jl")
+include("conversions.jl")
 include("ranges.jl")
 include("adjusters.jl")
 include("io.jl")

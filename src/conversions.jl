@@ -9,7 +9,7 @@ Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 @vectorize_1arg DateTime Date
 @vectorize_1arg Date DateTime
 
-### Conversions
+### External Conversions
 const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00 UTC
 function unix2date(x)
     rata = UNIXEPOCH + int64(1000*x)

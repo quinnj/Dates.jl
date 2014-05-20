@@ -128,7 +128,7 @@ Base.typemax(::Union(DateTime,Type{DateTime})) = DateTime(146138512,12,31,23,59,
 Base.typemin(::Union(DateTime,Type{DateTime})) = DateTime(-146138511,1,1,0,0,0)
 Base.typemax(::Union(Date,Type{Date})) = Date(252522163911149,12,31)
 Base.typemin(::Union(Date,Type{Date})) = Date(-252522163911150,1,1)
-# Date-DateTime promotion, <, ==
+# Date-DateTime promotion, isless, ==
 Base.promote_rule(::Type{Date},x::Type{DateTime}) = x
 Base.isless(x::Date,y::Date) = isless(value(x),value(y))
 Base.isless(x::DateTime,y::DateTime) = isless(value(x),value(y))

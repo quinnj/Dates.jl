@@ -1,3 +1,27 @@
+# TODO: optimize this
+function Base.string(dt::DateTime)
+    y,m,d = _day2date(_days(dt))
+    h,mi,s = hour(dt),minute(dt),second(dt)
+    yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
+    mm = lpad(m,2,"0")
+    dd = lpad(d,2,"0")
+    hh = lpad(h,2,"0")
+    mii = lpad(mi,2,"0")
+    ss = lpad(s,2,"0")
+    ms = millisecond(dt) == 0 ? "" : string(millisecond(dt)/1000.0)[2:end]
+    return "$yy-$mm-$(dd)T$hh:$mii:$ss$ms"
+end
+Base.show(io::IO,x::DateTime) = print(io,string(x))
+function Base.string(dt::Date)
+    y,m,d = _day2date(value(dt))
+    yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
+    mm = lpad(m,2,"0")
+    dd = lpad(d,2,"0")
+    return "$yy-$mm-$dd"
+end
+Base.show(io::IO,x::Date) = print(io,string(x))
+
+### Parsing
 const RMONTHS = ["january"=>1,"february"=>2,"march"=>3,"april"=>4,
                  "may"=>5,"june"=>6,"july"=>7,"august"=>8,"september"=>9,
                  "october"=>10,"november"=>11,"december"=>12]
