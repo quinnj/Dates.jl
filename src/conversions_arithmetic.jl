@@ -118,16 +118,3 @@ end
 (.-){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape([i - y for i in x], size(x))
 (.+){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .+ y
 (.-){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .- y
-
-# Temporal Expressions
-# TODO: Allow Array{Function} as 1st argument? with and=true keyword?
-function recur{T<:TimeType}(fun::Function,start::T,stop::T,step::Period=Day(1);inclusion=true)
-    a = T[]
-    negate = inclusion ? identity : (!)
-    i = start
-    while i <= stop
-        negate(fun(i)) && (push!(a,i))
-        i += step
-    end
-    return a
-end
