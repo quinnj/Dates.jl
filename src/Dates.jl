@@ -23,11 +23,11 @@ export Calendar, ISOCalendar,
 
 include("types.jl")
 include("accessors.jl")
-include("datefunctions.jl")
+include("query.jl")
 include("conversions_arithmetic.jl")
-include("io.jl")
 include("periods.jl")
 include("ranges.jl")
 include("adjusters.jl")
+include("io.jl")
 
 end # module

@@ -93,8 +93,6 @@ test = Date(1,1,1)
 @test Date(false,true,false) == test - Dates.Year(1) - Dates.Day(1)
 @test Date(false,true,true) == test - Dates.Year(1)
 @test Date(true,true,false) == test - Dates.Day(1)
-# These can have issues if out-of-Int64-range inputs are used since
-# convert(Int64,x) does some kind of truncation/wrap around
 @test Date(uint64(1),uint64(1),uint64(1)) == test
 @test Date(0xffffffffffffffff,uint64(1),uint64(1)) == test - Dates.Year(2)
 @test Date(int128(1),int128(1),int128(1)) == test
@@ -1543,12 +1541,12 @@ d = Dates.Date(2020,1,1)
 
 #d"2014-01-01"
 #dt"2014-01-01"
-#fmt"yyyy-mm-ddTHH:MM:SS"T
 
  #massage recur
  #research JSR-310, PHP? javascript? go? C#? for API completeness
  #round(dt,period)
  #add(dt,y,m,d,h,mi,s,ms); sub(dt,y,m,d,h,mi,s,ms); many adjusts at once?
+ 
  #pair with recur
   #tonext(dt,dayofweek); tonext(func,dt)
   #toprev(dt,dayofweek); toprev(func,dt)

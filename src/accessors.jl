@@ -71,34 +71,6 @@ yearmonthday(dt::TimeType) = _day2date(_days(dt))
 @vectorize_1arg TimeType monthday
 @vectorize_1arg TimeType yearmonthday
 
-# Conversion/Promotion
-Date(dt::TimeType) = convert(Date,dt)
-DateTime(dt::TimeType) = convert(DateTime,dt)
-Base.convert(::Type{DateTime},dt::Date) = DateTime(UTM(value(dt)*86400000))
-Base.convert(::Type{Date},dt::DateTime) = Date(UTD(_days(dt)))
-Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
-Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
-
-@vectorize_1arg DateTime Date
-@vectorize_1arg Date DateTime
-
-# Traits, Equality
-Base.isfinite{T<:TimeType}(::Union(TimeType,T)) = true
-calendar(dt::DateTime) = ISOCalendar
-calendar(dt::Date) = ISOCalendar
-Base.precision(dt::DateTime) = UTInstant{Millisecond}
-Base.precision(dt::Date) = UTInstant{Day}
-Base.typemax(::Union(DateTime,Type{DateTime})) = DateTime(146138512,12,31,23,59,59)
-Base.typemin(::Union(DateTime,Type{DateTime})) = DateTime(-146138511,1,1,0,0,0)
-Base.typemax(::Union(Date,Type{Date})) = Date(252522163911149,12,31)
-Base.typemin(::Union(Date,Type{Date})) = Date(-252522163911150,1,1)
-# Date-DateTime promotion, <, ==
-Base.promote_rule(::Type{Date},x::Type{DateTime}) = x
-Base.isless(x::Date,y::Date) = isless(value(x),value(y))
-Base.isless(x::DateTime,y::DateTime) = isless(value(x),value(y))
-Base.isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
-==(x::TimeType,y::TimeType) = ===(promote(x,y)...)
-
 # TODO: optimize this
 function Base.string(dt::DateTime)
     y,m,d = _day2date(_days(dt))
