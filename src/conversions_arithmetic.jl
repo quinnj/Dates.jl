@@ -1,3 +1,17 @@
+### truncation
+Base.trunc(dt::Date,p::Type{Year}) = Date(UTD(totaldays(year(dt),1,1)))
+Base.trunc(dt::Date,p::Type{Month}) = firstdayofmonth(dt)
+Base.trunc(dt::Date,p::Type{Day}) = dt
+
+Base.trunc(dt::DateTime,p::Type{Year}) = DateTime(trunc(Date(dt),Year))
+Base.trunc(dt::DateTime,p::Type{Month}) = DateTime(trunc(Date(dt),Month))
+Base.trunc(dt::DateTime,p::Type{Day}) = DateTime(Date(dt))
+Base.trunc(dt::DateTime,p::Type{Hour}) = dt - Minute(minute(dt)) - Second(second(dt)) - Millisecond(millisecond(dt))
+Base.trunc(dt::DateTime,p::Type{Minute}) = dt - Second(second(dt)) - Millisecond(millisecond(dt))
+Base.trunc(dt::DateTime,p::Type{Second}) = dt - Millisecond(millisecond(dt))
+Base.trunc(dt::DateTime,p::Type{Millisecond}) = dt
+
+### Conversions
 const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00 UTC
 function unix2date(x)
     rata = UNIXEPOCH + int64(1000*x)
