@@ -749,6 +749,11 @@ dec = Dates.DateTime(2013,12,11) #Wednesday
 @test Dates.isleap(Dates.DateTime(4)) == true
 @test Dates.isleap(Dates.DateTime(-4)) == true
 
+@test Dates.daysinyear(Dates.Date(2000)) == 366
+@test Dates.daysinyear(Dates.Date(2001)) == 365
+@test Dates.daysinyear(Dates.DateTime(2000)) == 366
+@test Dates.daysinyear(Dates.DateTime(2001)) == 365
+
 # Days of week from Monday = 1 to Sunday = 7
 @test Dates.dayofweek(Dates.DateTime(2013,12,22)) == 7
 @test Dates.dayofweek(Dates.DateTime(2013,12,23)) == 1
@@ -869,6 +874,87 @@ for i = 0:364
     dt += Dates.Day(1)
 end
 @test Dates.lastdayofweek(Dates.DateTime(2013,12,24)) == Dates.DateTime(2013,12,29)
+
+@test quarterofyear(Dates.Date(2000,1,1))  == 1
+@test quarterofyear(Dates.Date(2000,1,31))  == 1
+@test quarterofyear(Dates.Date(2000,2,1))  == 1
+@test quarterofyear(Dates.Date(2000,2,29))  == 1
+@test quarterofyear(Dates.Date(2000,3,1))  == 1
+@test quarterofyear(Dates.Date(2000,3,31))  == 1
+@test quarterofyear(Dates.Date(2000,4,1)) == 2
+@test quarterofyear(Dates.Date(2000,4,30)) == 2
+@test quarterofyear(Dates.Date(2000,5,1)) == 2
+@test quarterofyear(Dates.Date(2000,5,31)) == 2
+@test quarterofyear(Dates.Date(2000,6,1)) == 2
+@test quarterofyear(Dates.Date(2000,6,30)) == 2
+@test quarterofyear(Dates.Date(2000,7,1)) == 3
+@test quarterofyear(Dates.Date(2000,7,31)) == 3
+@test quarterofyear(Dates.Date(2000,8,1)) == 3
+@test quarterofyear(Dates.Date(2000,8,31)) == 3
+@test quarterofyear(Dates.Date(2000,9,1)) == 3
+@test quarterofyear(Dates.Date(2000,9,30)) == 3
+@test quarterofyear(Dates.Date(2000,10,1)) == 4
+@test quarterofyear(Dates.Date(2000,10,31)) == 4
+@test quarterofyear(Dates.Date(2000,11,1)) == 4
+@test quarterofyear(Dates.Date(2000,11,30)) == 4
+@test quarterofyear(Dates.Date(2000,12,1)) == 4
+@test quarterofyear(Dates.Date(2000,12,31)) == 4
+
+@test quarterofyear(Dates.DateTime(2000,1,1))  == 1
+@test quarterofyear(Dates.DateTime(2000,1,31))  == 1
+@test quarterofyear(Dates.DateTime(2000,2,1))  == 1
+@test quarterofyear(Dates.DateTime(2000,2,29))  == 1
+@test quarterofyear(Dates.DateTime(2000,3,1))  == 1
+@test quarterofyear(Dates.DateTime(2000,3,31))  == 1
+@test quarterofyear(Dates.DateTime(2000,4,1)) == 2
+@test quarterofyear(Dates.DateTime(2000,4,30)) == 2
+@test quarterofyear(Dates.DateTime(2000,5,1)) == 2
+@test quarterofyear(Dates.DateTime(2000,5,31)) == 2
+@test quarterofyear(Dates.DateTime(2000,6,1)) == 2
+@test quarterofyear(Dates.DateTime(2000,6,30)) == 2
+@test quarterofyear(Dates.DateTime(2000,7,1)) == 3
+@test quarterofyear(Dates.DateTime(2000,7,31)) == 3
+@test quarterofyear(Dates.DateTime(2000,8,1)) == 3
+@test quarterofyear(Dates.DateTime(2000,8,31)) == 3
+@test quarterofyear(Dates.DateTime(2000,9,1)) == 3
+@test quarterofyear(Dates.DateTime(2000,9,30)) == 3
+@test quarterofyear(Dates.DateTime(2000,10,1)) == 4
+@test quarterofyear(Dates.DateTime(2000,10,31)) == 4
+@test quarterofyear(Dates.DateTime(2000,11,1)) == 4
+@test quarterofyear(Dates.DateTime(2000,11,30)) == 4
+@test quarterofyear(Dates.DateTime(2000,12,1)) == 4
+@test quarterofyear(Dates.DateTime(2000,12,31)) == 4
+
+@test dayofquarter(Dates.Date(2014,1,1)) == 1
+@test dayofquarter(Dates.Date(2014,4,1)) == 1
+@test dayofquarter(Dates.Date(2014,7,1)) == 1
+@test dayofquarter(Dates.Date(2014,10,1)) == 1
+@test dayofquarter(Dates.Date(2014,3,31)) == 90
+@test dayofquarter(Dates.Date(2014,6,30)) == 91
+@test dayofquarter(Dates.Date(2014,9,30)) == 92
+@test dayofquarter(Dates.Date(2014,12,31)) == 92
+@test dayofquarter(Dates.DateTime(2014,1,1)) == 1
+@test dayofquarter(Dates.DateTime(2014,4,1)) == 1
+@test dayofquarter(Dates.DateTime(2014,7,1)) == 1
+@test dayofquarter(Dates.DateTime(2014,10,1)) == 1
+@test dayofquarter(Dates.DateTime(2014,3,31)) == 90
+@test dayofquarter(Dates.DateTime(2014,6,30)) == 91
+@test dayofquarter(Dates.DateTime(2014,9,30)) == 92
+@test dayofquarter(Dates.DateTime(2014,12,31)) == 92
+
+#trunc
+dt = Dates.Date(2012,12,21)
+@test trunc(dt,Dates.Year) == Dates.Date(2012)
+@test trunc(dt,Dates.Month) == Dates.Date(2012,12)
+@test trunc(dt,Dates.Day) == Dates.Date(2012,12,21)
+dt = Dates.DateTime(2012,12,21,16,30,20,200)
+@test trunc(dt,Dates.Year) == Dates.DateTime(2012)
+@test trunc(dt,Dates.Month) == Dates.DateTime(2012,12)
+@test trunc(dt,Dates.Day) == Dates.DateTime(2012,12,21)
+@test trunc(dt,Dates.Hour) == Dates.DateTime(2012,12,21,16)
+@test trunc(dt,Dates.Minute) == Dates.DateTime(2012,12,21,16,30)
+@test trunc(dt,Dates.Second) == Dates.DateTime(2012,12,21,16,30,20)
+@test trunc(dt,Dates.Millisecond) == Dates.DateTime(2012,12,21,16,30,20,200)
 
 # Test conversion to and from unix
 @test Dates.unix2date(Dates.date2unix(DateTime(2000,1,1))) == DateTime(2000,1,1)
@@ -1444,7 +1530,7 @@ d = Dates.Date(2020,1,1)
 @test length(Dates.Year(1):Dates.Year(10)) == 10
 @test length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
 @test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
-@test_throws OverflowError length(typemin(Dates.Year):typemax(Dates.Year)) == 0
+@test_throws OverflowError length(typemin(Dates.Year):typemax(Dates.Year))
 @test_throws MethodError Dates.Date(0):Dates.DateTime(2000)
 @test_throws MethodError Dates.Date(0):Dates.Year(10)
 @test length(range(Dates.Date(2000),366)) == 366
@@ -1454,8 +1540,23 @@ d = Dates.Date(2020,1,1)
 @test last(range(Dates.DateTime(2000),Dates.Day(366),2)) == last(range(Dates.DateTime(2000),Dates.Hour(8784),2))
 
 #TODO
+
+#d"2014-01-01"
+#dt"2014-01-01"
+#fmt"yyyy-mm-ddTHH:MM:SS"T
+
  #massage recur
  #research JSR-310, PHP? javascript? go? C#? for API completeness
+ #round(dt,period)
+ #add(dt,y,m,d,h,mi,s,ms); sub(dt,y,m,d,h,mi,s,ms); many adjusts at once?
+ #pair with recur
+  #tonext(dt,dayofweek); tonext(func,dt)
+  #toprev(dt,dayofweek); toprev(func,dt)
+  #tolast(dt,dayofweek,precision=Month); tolast(func,dt,precision=Month)
+  #tofirst(dt,dayofweek,precision=Month); tofirst(func,dt,precision=Month)
  #formatting/parsing
+ #conversions: ruby? python? javascript? etc.
  #make TimeStamp fully parameterized (Instant, TimeZone, Calendar)
   #have datetime field + nanosecond field?
+#NEED TESTS
+ 

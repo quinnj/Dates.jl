@@ -5,13 +5,14 @@ export Calendar, ISOCalendar,
     Period, Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
     # accessors
     year, month, week, day, hour, minute, second, millisecond,
-    yearmonth, monthday, yearmonthday,
+    dayofmonth, yearmonth, monthday, yearmonthday,
     # conversions
     ratadays2date, date2ratadays, unix2date, date2unix, julian2date, date2julian,
     # date functions
     monthname, monthabbr, dayname, dayabbr, now,
-    isleap, daysinmonth, lastdayofmonth, firstdayofmonth, dayofweek, dayofyear,
-    dayofweekofmonth, daysofweekinmonth, firstdayofweek, lastdayofweek,
+    isleap, daysinmonth, daysinyear, quarterofyear, dayofquarter,
+    lastdayofmonth, firstdayofmonth, firstdayofweek, lastdayofweek,
+    dayofweek, dayofyear, dayofweekofmonth, daysofweekinmonth,
     recur, calendar, precision, ISOFormat,
     # consts
     Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday,
