@@ -51,6 +51,7 @@ minute(dt::DateTime) = mod(fld(value(dt),60000),60)
 second(dt::DateTime) = mod(fld(value(dt),1000),60)
 millisecond(dt::DateTime) = mod(value(dt),1000)
 
+dayofmonth(dt::TimeType) = day(dt)
 yearmonth(dt::TimeType) = _yearmonth(_days(dt))
 monthday(dt::TimeType) = _monthday(_days(dt))
 yearmonthday(dt::TimeType) = _day2date(_days(dt))
@@ -65,6 +66,7 @@ yearmonthday(dt::TimeType) = _day2date(_days(dt))
 @vectorize_1arg DateTime second
 @vectorize_1arg DateTime millisecond
 
+@vectorize_1arg TimeType dayofmonth
 @vectorize_1arg TimeType yearmonth
 @vectorize_1arg TimeType monthday
 @vectorize_1arg TimeType yearmonthday
@@ -153,6 +155,7 @@ end
 
 isleap(dt::TimeType) = isleap(year(dt))
 daysinmonth(dt::TimeType) = daysinmonth(yearmonth(dt)...)
+daysinyear(dt::TimeType) = 365 + isleap(dt)
 
 function lastdayofmonth(dt::Date) 
     y,m,d = yearmonthday(dt)
@@ -193,6 +196,14 @@ function daysofweekinmonth(dt::TimeType)
            ld == 30 ? ((d in THIRTY) ? 5 : 4) :
            (d in THIRTYONE) ? 5 : 4
 end
+
+function quarterofyear(dt::TimeType)
+    m = month(dt)
+    return m < 4 ? 1 : m < 7 ? 2 : m < 10 ? 3 : 4
+end
+
+const QUARTERDAYS = [0,90,181,273]
+dayofquarter(dt::TimeType) = dayofyear(dt) - QUARTERDAYS[quarterofyear(dt)]
 
 @vectorize_1arg TimeType isleap
 @vectorize_1arg TimeType daysinmonth
