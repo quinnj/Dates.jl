@@ -29,15 +29,15 @@ Base.typemin{P<:Period}(::Type{P}) = P(typemin(Int64))
 Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
 (-){P<:Period}(x::P) = P(-value(x))
-<{P<:Period}(x::P,y::P) = <(value(x),value(y))
+Base.isless{P<:Period}(x::P,y::P) = isless(value(x),value(y))
 =={P<:Period}(x::P,y::P) = ==(value(x),value(y))
-< {R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isless{R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
 =={R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
-< {R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
+Base.isless{R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
 =={R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))
 
-<(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
-==(x::Period,y::Period) = throw(ArgumentError("Can't compare Periods of different types"))
+Base.isless(x::Period,y::Period) = throw(ArgumentError("Can't compare $(typeof(x)) and $(typeof(y))"))
+==(x::Period,y::Period) = throw(ArgumentError("Can't compare $(typeof(x)) and $(typeof(y))"))
 
 #Period Arithmetic:
 import Base.div
