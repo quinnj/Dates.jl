@@ -29,11 +29,11 @@ end
 function Base.length{T<:Period}(r::StepRange{T})
     isempty(r) && return zero(T)
     if r.step > one(T)
-        return Base.checked_add(div(value(r.stop) - value(r.start), value(r.step)), 1)
-    elseif value(r.step) < -1
-        return Base.checked_add(div(value(r.start) - value(r.stop), -value(r.step)), 1)
+        return Base.checked_add(div(value(r.stop) - value(r.start), value(r.step)), int64(1))
+    elseif value(r.step) < int64(-1)
+        return Base.checked_add(div(value(r.start) - value(r.stop), -value(r.step)), int64(1))
     else
-        Base.checked_add(div(Base.checked_sub(value(r.stop), value(r.start)), value(r.step)), 1)
+        Base.checked_add(div(Base.checked_sub(value(r.stop), value(r.start)), value(r.step)), int64(1))
     end
 end
 
