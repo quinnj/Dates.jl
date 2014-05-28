@@ -1,6 +1,6 @@
 # TODO: optimize this
 function Base.string(dt::DateTime)
-    y,m,d = _day2date(_days(dt))
+    y,m,d = yearmonthday(days(dt))
     h,mi,s = hour(dt),minute(dt),second(dt)
     yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
     mm = lpad(m,2,"0")
@@ -9,11 +9,11 @@ function Base.string(dt::DateTime)
     mii = lpad(mi,2,"0")
     ss = lpad(s,2,"0")
     ms = millisecond(dt) == 0 ? "" : string(millisecond(dt)/1000.0)[2:end]
-    return "$yy-$mm-$(dd)T$hh:$mii:$ss$ms"
+    return "$yy-$mm-$(dd)T$hh:$mii:$ss$(ms)Z"
 end
 Base.show(io::IO,x::DateTime) = print(io,string(x))
 function Base.string(dt::Date)
-    y,m,d = _day2date(value(dt))
+    y,m,d = yearmonthday(value(dt))
     yy = y < 0 ? @sprintf("%05i",y) : lpad(y,4,"0")
     mm = lpad(m,2,"0")
     dd = lpad(d,2,"0")

@@ -20,7 +20,7 @@ const MONTHDAYS2 = Int64[0,31,59,90,120,151,181,212,243,273,304,334]
 dayofyear(y,m,d) = MONTHDAYS2[m] + d + (m > 2 && isleap(y))
 
 
-### Weeks/Days of the Week
+### Days of the Week
 const Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday = 1,2,3,4,5,6,7
 const Mon,Tue,Wed,Thu,Fri,Sat,Sun = 1,2,3,4,5,6,7
 const DAYSOFWEEK = [1=>"Monday",2=>"Tuesday",3=>"Wednesday",
@@ -30,7 +30,16 @@ const DAYSOFWEEKABBR = [1=>"Mon",2=>"Tue",3=>"Wed",
 dayname(dt::TimeType) = DAYSOFWEEK[dayofweek(dt)]
 dayabbr(dt::TimeType) = DAYSOFWEEKABBR[dayofweek(dt)]
 
-dayofweek(dt::TimeType) = dayofweek(_days(dt))
+dayofweek(dt::TimeType) = dayofweek(days(dt))
+
+# Convenience methods for each day
+ismonday(dt::TimeType) = dayofweek(dt) == Mon
+istuesday(dt::TimeType) = dayofweek(dt) == Tue
+iswednesday(dt::TimeType) = dayofweek(dt) == Wed
+isthursday(dt::TimeType) = dayofweek(dt) == Thu
+isfriday(dt::TimeType) = dayofweek(dt) == Fri
+issaturday(dt::TimeType) = dayofweek(dt) == Sat
+issunday(dt::TimeType) = dayofweek(dt) == Sun
 
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
 dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
@@ -58,7 +67,7 @@ end
 ### Months
 const January,February,March,April,May,June = 1,2,3,4,5,6
 const July,August,September,October,November,December = 7,8,9,10,11,12
-const Jan,Feb,Mar,Apr,Jun,Jul,Aug,Sep,Oct,Nov,Dec = 1,2,3,4,5,6,7,8,9,10,11,12
+const Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec = 1,2,3,4,5,6,7,8,9,10,11,12
 const MONTHS = [1=>"January",2=>"February",3=>"March",4=>"April",
                 5=>"May",6=>"June",7=>"July",8=>"August",9=>"September",
                 10=>"October",11=>"November",12=>"December"]
@@ -95,3 +104,8 @@ dayofquarter(dt::TimeType) = dayofyear(dt) - QUARTERDAYS[quarterofyear(dt)]
 
 @vectorize_1arg TimeType quarterofyear
 @vectorize_1arg TimeType dayofquarter
+
+export dayofweek, isleap, daysinmonth, daysinyear, dayofyear, dayname, dayabbr,
+        ismonday, istuesday, iswednesday, isthursday, isfriday, issaturday, issunday,
+        dayofweekofmonth, daysofweekinmonth, monthname, monthabbr,
+        quarterofyear, dayofquarter

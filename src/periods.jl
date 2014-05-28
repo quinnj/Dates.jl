@@ -30,7 +30,7 @@ Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
 (-){P<:Period}(x::P) = P(-value(x))
 Base.isless{P<:Period}(x::P,y::P) = isless(value(x),value(y))
-=={P<:Period}(x::P,y::P) = ==(value(x),value(y))
+=={P<:Period}(x::P,y::P) = ===(value(x),value(y))
 Base.isless{R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
 =={R<:Real}(x::Period,y::R) = throw(ArgumentError("Can't compare Period-$R"))
 Base.isless{R<:Real}(y::R,x::Period) = throw(ArgumentError("Can't compare Period-$R"))

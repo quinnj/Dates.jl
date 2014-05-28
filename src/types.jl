@@ -56,14 +56,6 @@ immutable ISOCalendar <: Calendar end
 # TimeTypes wrap Instants to provide human representations of time
 abstract TimeType <: AbstractTime
 
-# A Timestamp type couples an Instant type with a Calendar type
-# to provide convenient human-conversion rules carried out
-# by multiple dispatch.
-immutable Timestamp{T<:Instant,C<:Calendar} <: TimeType
-    instant::T
-    Timestamp(x::T) = new(x)
-end
-
 # DateTime is a millisecond precision UTInstant interpreted thru ISOCalendar
 immutable DateTime <: TimeType
     instant::UTInstant{Millisecond}
@@ -134,3 +126,6 @@ Base.isless(x::Date,y::Date) = isless(value(x),value(y))
 Base.isless(x::DateTime,y::DateTime) = isless(value(x),value(y))
 Base.isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
 ==(x::TimeType,y::TimeType) = ===(promote(x,y)...)
+
+export Period, Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
+       TimeType, DateTime, Date

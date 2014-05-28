@@ -2,7 +2,7 @@
 Date(dt::TimeType) = convert(Date,dt)
 DateTime(dt::TimeType) = convert(DateTime,dt)
 Base.convert(::Type{DateTime},dt::Date) = DateTime(UTM(value(dt)*86400000))
-Base.convert(::Type{Date},dt::DateTime) = Date(UTD(_days(dt)))
+Base.convert(::Type{Date},dt::DateTime) = Date(UTD(days(dt)))
 Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
 Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 
@@ -19,8 +19,8 @@ end
 date2unix(dt::DateTime) = (value(dt) - UNIXEPOCH)/1000.0
 now() = unix2date(time())
 
-ratadays2date(days) = _day2date(days)
-date2ratadays(dt::TimeType) = _days(dt)
+ratadays2date(days) = yearmonthday(days)
+date2ratadays(dt::TimeType) = days(dt)
 
 # Julian conversions
 const JULIANEPOCH = value(DateTime(-4713,11,24,12))
@@ -30,3 +30,5 @@ function julian2date(f)
 end
 # Returns # of julian days since -4713-11-24T12:00:00 UTC
 date2julian(dt::DateTime) = (value(dt) - JULIANEPOCH)/86400000.0
+
+export unix2date, date2unix, now, ratadays2date, date2ratadays, julian2date, date2julian

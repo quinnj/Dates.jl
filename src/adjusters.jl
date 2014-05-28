@@ -16,6 +16,7 @@ firstdayofweek(dt::Date) = Date(UTD(value(dt) - dayofweek(dt) + 1))
 firstdayofweek(dt::DateTime) = DateTime(firstdayofweek(Date(dt)))
 lastdayofweek(dt::Date) = Date(UTD(value(dt) + (7-dayofweek(dt))))
 lastdayofweek(dt::DateTime) = DateTime(lastdayofweek(Date(dt)))
+
 @vectorize_1arg TimeType firstdayofweek
 @vectorize_1arg TimeType lastdayofweek
 
@@ -40,75 +41,150 @@ end
 @vectorize_1arg TimeType firstdayofyear
 @vectorize_1arg TimeType lastdayofyear
 
+function firstdayofquarter(dt::Date)
+    y,m = yearmonth(dt)
+    if m < 4
+        return Date(y,1,1)
+    elseif m < 7
+        return Date(y,4,1)
+    elseif m < 10
+        return Date(y,7,1)
+    else
+        return Date(y,10,1)
+    end
+end
+function lastdayofquarter(dt::Date)
+    y,m = yearmonth(dt)
+    if m < 4
+        return Date(y,3,31)
+    elseif m < 7
+        return Date(y,6,30)
+    elseif m < 10
+        return Date(y,9,30)
+    else
+        return Date(y,12,31)
+    end
+end
+firstdayofquarter(dt::DateTime) = DateTime(firstdayofquarter(Date(dt)))
+lastdayofquarter(dt::DateTime) = DateTime(lastdayofquarter(Date(dt)))
 @vectorize_1arg TimeType firstdayofquarter
 @vectorize_1arg TimeType lastdayofquarter
 
-
-abstract Adjuster <: AbstractTime
-
-immutable DOWAdjuster  <: Adjuster 
-
-end
-immutable FuncAdjuster <: Adjuster 
-
-end
-
 # Temporal Adjusters
-function recur{T<:TimeType}(fun::Function,start::T,stop::T,step::Period=Day(1),negate::Bool=true)
-    a = T[]
-    n = negate ? identity : (!)
-    i = start
-    while i <= stop
-        n(fun(i)) && (push!(a,i))
-        i += step
+immutable DateFunction
+    f::Function
+    # validate boolean, single-arg inner constructor
+    function DateFunction(f::Function,negate::Bool,dt::Dates.TimeType)
+        f(dt) in (true,false) || throw(ArgumentError("Provided function must take a single TimeType argument and return true or false"))
+        n = !negate ? identity : (!)
+        return new(@eval x->$n($f(x)))
     end
-    return a
+end
+Base.show(io::IO,df::DateFunction) = println(df.f.code)
+
+# Core adjuster
+function adjust(df::DateFunction,start,step,limit)
+    for i = 1:limit
+        df.f(start) && return start
+        start += step
+    end
+    throw(ArgumentError("Adjustment limit reached: $limit iterations"))
+end
+
+function adjust(func::Function,start;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,start),start,step,limit)
+end
+
+# Constructors using DateFunctions
+function Date(func::Function,y;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,Date(y)),Date(y),step,limit)
+end
+function Date(func::Function,y,m;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,Date(y,m)),Date(y,m),step,limit)
+end
+
+function DateTime(func::Function,y;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y),step,limit)
+end
+function DateTime(func::Function,y,m;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y,m)),DateTime(y,m),step,limit)
+end
+function DateTime(func::Function,y,m,d;step::Period=Hour(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y,m,d),step,limit)
+end
+function DateTime(func::Function,y,m,d,h;step::Period=Minute(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y,m,d,h),step,limit)
+end
+function DateTime(func::Function,y,m,d,h,mi;step::Period=Second(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y,m,d,h,mi),step,limit)
+end
+function DateTime(func::Function,y,m,d,h,mi,s;step::Period=Millisecond(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y,m,d,h,mi,s),step,limit)
 end
 
 # Return the next TimeType that falls on dow
-function tonext(dt::TimeType,dow::Int)
-    d = Day(1)
-    while dayofweek(dt) != dow
-        dt += d
-    end
-    return dt
-end
+# "same" indicates whether the current date can be considered or not
+ISDAYOFWEEK = [Mon=>DateFunction(ismonday,false,Date(0)),
+               Tue=>DateFunction(istuesday,false,Date(0)),
+               Wed=>DateFunction(iswednesday,false,Date(0)),
+               Thu=>DateFunction(isthursday,false,Date(0)),
+               Fri=>DateFunction(isfriday,false,Date(0)),
+               Sat=>DateFunction(issaturday,false,Date(0)),
+               Sun=>DateFunction(issunday,false,Date(0))]
+
+tonext(dt::TimeType,dow::Int;same::Bool=false) = adjust(ISDAYOFWEEK[dow],same ? dt : dt+Day(1),Day(1),7)
 # Return the next TimeType where func evals true using step in incrementing
-function tonext(func::Function,dt::TimeType,step::Period=Day(1),negate::Bool=true)
-
+function tonext(func::Function,dt::TimeType;step::Period=Day(1),negate::Bool=false,limit::Int=10000,same::Bool=false)
+    return adjust(DateFunction(func,negate,dt),same ? dt : dt+step,step,limit)
 end
 
-# Return the previous TimeType that falls on dow
-function toprev(dt::TimeType,dow::Int)
-    d = Day(-1)
-    while dayofweek(dt) != dow
-        dt += d
-    end
-    return dt
-end
-# Return the previous TimeType where func evals true using step in incrementing
-function toprev(func::Function,dt::TimeType,step::Period=Day(1),negate::Bool=true)
-
+toprev(dt::TimeType,dow::Int;same::Bool=false) = adjust(ISDAYOFWEEK[dow],same ? dt : dt+Day(-1),Day(-1),7)
+function toprev(func::Function,dt::TimeType;step::Period=Day(-1),negate::Bool=false,limit::Int=10000,same::Bool=false)
+    return adjust(DateFunction(func,negate,dt),same ? dt : dt+step,step,limit)
 end
 
 # Return the first TimeType that falls on dow in the Month or Year
-function tofirst(dt::TimeType,dow::Int,precision::Union(Type{Year},Type{Month})=Month)
-    d = Day(-1)
-    while dayofweek(dt) != dow
-        dt += d
-    end
-    return dt
+function tofirst(dt::TimeType,dow::Int;of::Union(Type{Year},Type{Month})=Month)
+    dt = of <: Month ? firstdayofmonth(dt) : firstdayofyear(dt)
+    return adjust(ISDAYOFWEEK[dow],dt,Day(1),366)
 end
-# Return the first TimeType where func evals true using step in incrementing in the Month or Year
-function tofirst(func::Function,dt::TimeType,step::Period=Day(1),negate::Bool=true,precision::Union(Type{Year},Type{Month})=Month)
-
+function tofirst(func::Function,dt::TimeType;
+                 step::Period=Day(1),negate::Bool=false,limit::Int=10000,of::Union(Type{Year},Type{Month})=Month)
+    dt,limit = of <: Month ? (firstdayofmonth(dt),daysinmonth(dt)) : 
+                             (firstdayofyear(dt),daysinyear(dt))
+    return adjust(DateFunction(func,negate,dt),dt,step,limit)
 end
 
 # Return the last TimeType that falls on dow in the Month or Year
-function tolast(dt::TimeType,dow::Int,precision::Union(Type{Year},Type{Month})=Month)
-
+function tolast(dt::TimeType,dow::Int;of::Union(Type{Year},Type{Month})=Month)
+    dt = of <: Month ? lastdayofmonth(dt) : lastdayofyear(dt)
+    return adjust(ISDAYOFWEEK[dow],dt,Day(-1),366)
 end
-# Return the last TimeType where func evals true using step in incrementing in the Month or Year
-function tolast(func::Function,dt::TimeType,step::Period=Day(1),negate::Bool=true,precision::Union(Type{Year},Type{Month})=Month)
-
+function tolast(func::Function,dt::TimeType;
+                 step::Period=Day(-1),negate::Bool=false,limit::Int=10000,of::Union(Type{Year},Type{Month})=Month)
+    dt,limit = of <: Month ? (lastdayofmonth(dt),daysinmonth(dt)) : 
+                             (lastdayofyear(dt),daysinyear(dt))
+    return adjust(DateFunction(func,negate,dt),dt,step,limit)
 end
+
+function recur{T<:TimeType}(fun::Function,start::T,stop::T;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    a = T[]
+    #sizehint(a,)
+    df = DateFunction(fun,negate,start)
+    while true
+        next = Dates.adjust(df,start,step,limit)
+        next > stop && break
+        start = start == next ? start+step : next+step
+        push!(a,next)
+    end
+    return a
+end
+function recur{T<:TimeType}(fun::Function,dr::StepRange{T};negate::Bool=false,limit::Int=10000)
+    return recur(fun,first(dr),last(dr);step=step(dr),negate=negate,limit=limit)
+end
+
+export firstdayofweek, lastdayofweek,
+       firstdayofmonth, lastdayofmonth,
+       firstdayofyear, lastdayofyear,
+       firstdayofquarter, lastdayofquarter,
+       adjust, tonext, toprev, tofirst, tolast, recur
