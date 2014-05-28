@@ -1,15 +1,15 @@
 using Dates
 using Base.Test
 
-include("test/test_types.jl")
-include("test/test_periods.jl")
-include("test/test_accessors.jl")
-include("test/test_query.jl")
-include("test/test_arithmetic.jl")
-include("test/test_conversions.jl")
-include("test/test_ranges.jl")
-include("test/test_adjusters.jl")
-include("test/test_io.jl")
+include("test_types.jl")
+include("test_periods.jl")
+include("test_accessors.jl")
+include("test_query.jl")
+include("test_arithmetic.jl")
+include("test_conversions.jl")
+include("test_ranges.jl")
+include("test_adjusters.jl")
+include("test_io.jl")
 
 
 #TODO

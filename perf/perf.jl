@@ -102,47 +102,48 @@ results = benchmarks(perfs)
 | 41    | "arithmetic"     | "_dt2 + _ms"                       | 0.0769642 |=#
 
 
-#=41x3 DataFrame
+#=In  [13]: showall(results[[:Category,:Benchmark,:TotalWall]])
+41x3 DataFrame
 |-------|------------------|------------------------------------|-----------|
 | Row # | Category         | Benchmark                          | TotalWall |
-| 1     | "Construction"   | "Dates.Date(2014,1,1)"             | 0.205581  |
-| 2     | "Construction"   | "Dates.DateTime(2014,1,1,0,0,0,0)" | 0.201143  |
-| 3     | "Accessor"       | "Dates.year(_dt)"                  | 0.217777  |
-| 4     | "Accessor"       | "Dates.month(_dt)"                 | 0.18708   |
-| 5     | "Accessor"       | "Dates.day(_dt)"                   | 0.194145  |
-| 6     | "Accessor"       | "Dates.hour(_dt2)"                 | 0.0977585 |
-| 7     | "Accessor"       | "Dates.minute(_dt2)"               | 0.0931265 |
-| 8     | "Accessor"       | "Dates.second(_dt2)"               | 0.0969722 |
-| 9     | "Accessor"       | "Dates.millisecond(_dt2)"          | 0.0417307 |
-| 10    | "Conversion"     | "Dates.Date(_dt2)"                 | 0.0521314 |
-| 11    | "Conversion"     | "Dates.DateTime(_dt)"              | 0.0860954 |
-| 12    | "string"         | "string(_dt)"                      | 1.87128   |
-| 13    | "string"         | "string(_dt2)"                     | 3.88585   |
-| 14    | "date functions" | "Dates.isleap(_dt)"                | 0.183444  |
-| 15    | "date functions" | "Dates.isleap(_dt2)"               | 0.216043  |
-| 16    | "date functions" | "Dates.firstdayofmonth(_dt)"       | 0.30164   |
-| 17    | "date functions" | "Dates.firstdayofmonth(_dt2)"      | 0.369277  |
-| 18    | "date functions" | "Dates.lastdayofmonth(_dt)"        | 0.340101  |
-| 19    | "date functions" | "Dates.lastdayofmonth(_dt2)"       | 0.33823   |
-| 20    | "date functions" | "Dates.dayofweek(_dt)"             | 0.0384072 |
-| 21    | "date functions" | "Dates.dayofweek(_dt2)"            | 0.0969038 |
-| 22    | "date functions" | "Dates.dayofweekofmonth(_dt)"      | 0.196244  |
-| 23    | "date functions" | "Dates.dayofweekofmonth(_dt2)"     | 0.235858  |
-| 24    | "date functions" | "Dates.daysofweekinmonth(_dt)"     | 0.22584   |
-| 25    | "date functions" | "Dates.daysofweekinmonth(_dt2)"    | 0.238684  |
-| 26    | "date functions" | "Dates.firstdayofweek(_dt)"        | 0.065423  |
-| 27    | "date functions" | "Dates.firstdayofweek(_dt2)"       | 0.0923632 |
-| 28    | "date functions" | "Dates.lastdayofweek(_dt)"         | 0.089593  |
-| 29    | "date functions" | "Dates.lastdayofweek(_dt2)"        | 0.0855685 |
-| 30    | "date functions" | "Dates.dayofyear(_dt)"             | 0.278191  |
-| 31    | "date functions" | "Dates.dayofyear(_dt2)"            | 0.344696  |
-| 32    | "arithmetic"     | "_dt + _y"                         | 0.316232  |
-| 33    | "arithmetic"     | "_dt2 + _y"                        | 0.497521  |
-| 34    | "arithmetic"     | "_dt + _m"                         | 0.395687  |
-| 35    | "arithmetic"     | "_dt2 + _m"                        | 0.53815   |
-| 36    | "arithmetic"     | "_dt + _d"                         | 0.0821953 |
-| 37    | "arithmetic"     | "_dt2 + _d"                        | 0.0833318 |
-| 38    | "arithmetic"     | "_dt2 + _h"                        | 0.0842699 |
-| 39    | "arithmetic"     | "_dt2 + _mi"                       | 0.0844988 |
-| 40    | "arithmetic"     | "_dt2 + _s"                        | 0.0838104 |
-| 41    | "arithmetic"     | "_dt2 + _ms"                       | 0.0513933 |=#
+| 1     | "Construction"   | "Dates.Date(2014,1,1)"             | 0.0980119 |
+| 2     | "Construction"   | "Dates.DateTime(2014,1,1,0,0,0,0)" | 0.0895475 |
+| 3     | "Accessor"       | "Dates.year(_dt)"                  | 0.0657421 |
+| 4     | "Accessor"       | "Dates.month(_dt)"                 | 0.0655449 |
+| 5     | "Accessor"       | "Dates.day(_dt)"                   | 0.070821  |
+| 6     | "Accessor"       | "Dates.hour(_dt2)"                 | 0.0572112 |
+| 7     | "Accessor"       | "Dates.minute(_dt2)"               | 0.055226  |
+| 8     | "Accessor"       | "Dates.second(_dt2)"               | 0.0523492 |
+| 9     | "Accessor"       | "Dates.millisecond(_dt2)"          | 0.0460667 |
+| 10    | "Conversion"     | "Dates.Date(_dt2)"                 | 0.0898486 |
+| 11    | "Conversion"     | "Dates.DateTime(_dt)"              | 0.0781383 |
+| 12    | "string"         | "string(_dt)"                      | 1.81929   |
+| 13    | "string"         | "string(_dt2)"                     | 3.87923   |
+| 14    | "date functions" | "Dates.isleap(_dt)"                | 0.105963  |
+| 15    | "date functions" | "Dates.isleap(_dt2)"               | 0.0670621 |
+| 16    | "date functions" | "Dates.firstdayofmonth(_dt)"       | 0.0753262 |
+| 17    | "date functions" | "Dates.firstdayofmonth(_dt2)"      | 0.122178  |
+| 18    | "date functions" | "Dates.lastdayofmonth(_dt)"        | 0.129431  |
+| 19    | "date functions" | "Dates.lastdayofmonth(_dt2)"       | 0.122189  |
+| 20    | "date functions" | "Dates.dayofweek(_dt)"             | 0.0460547 |
+| 21    | "date functions" | "Dates.dayofweek(_dt2)"            | 0.0516793 |
+| 22    | "date functions" | "Dates.dayofweekofmonth(_dt)"      | 0.077735  |
+| 23    | "date functions" | "Dates.dayofweekofmonth(_dt2)"     | 0.0983128 |
+| 24    | "date functions" | "Dates.daysofweekinmonth(_dt)"     | 0.0954514 |
+| 25    | "date functions" | "Dates.daysofweekinmonth(_dt2)"    | 0.102127  |
+| 26    | "date functions" | "Dates.firstdayofweek(_dt)"        | 0.0551054 |
+| 27    | "date functions" | "Dates.firstdayofweek(_dt2)"       | 0.0971863 |
+| 28    | "date functions" | "Dates.lastdayofweek(_dt)"         | 0.0880267 |
+| 29    | "date functions" | "Dates.lastdayofweek(_dt2)"        | 0.0908077 |
+| 30    | "date functions" | "Dates.dayofyear(_dt)"             | 0.231741  |
+| 31    | "date functions" | "Dates.dayofyear(_dt2)"            | 0.268343  |
+| 32    | "arithmetic"     | "_dt + _y"                         | 0.168302  |
+| 33    | "arithmetic"     | "_dt2 + _y"                        | 0.177796  |
+| 34    | "arithmetic"     | "_dt + _m"                         | 0.169318  |
+| 35    | "arithmetic"     | "_dt2 + _m"                        | 0.220435  |
+| 36    | "arithmetic"     | "_dt + _d"                         | 0.08031   |
+| 37    | "arithmetic"     | "_dt2 + _d"                        | 0.0814756 |
+| 38    | "arithmetic"     | "_dt2 + _h"                        | 0.0810951 |
+| 39    | "arithmetic"     | "_dt2 + _mi"                       | 0.079283  |
+| 40    | "arithmetic"     | "_dt2 + _s"                        | 0.0928423 |
+| 41    | "arithmetic"     | "_dt2 + _ms"                       | 0.0816582 |=#

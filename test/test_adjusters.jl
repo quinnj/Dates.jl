@@ -304,7 +304,7 @@ januarymondays2014 = [Dates.Date(2014,1,6),Dates.Date(2014,1,13),Dates.Date(2014
 
 # All leap days in 20th century
 @test length(Dates.recur(Dates.Date(1900):Dates.Date(2000)) do x
-    month(x) == Feb && day(x) == 29
+    Dates.month(x) == Dates.Feb && Dates.day(x) == 29
 end) == 24
 
 # All observed Christmas days in 20th century
