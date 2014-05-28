@@ -264,3 +264,13 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test_throws ArgumentError 1 < Dates.Millisecond(1)
 @test_throws ArgumentError Dates.Year(1) < Dates.Millisecond(1)
 @test_throws ArgumentError Dates.Year(1) == Dates.Millisecond(1)
+
+@test Dates.Year("1") == y
+@test Dates.Month("1") == m
+@test Dates.Week("1") == w
+@test Dates.Day("1") == d
+@test Dates.Hour("1") == h
+@test Dates.Minute("1") == mi
+@test Dates.Second("1") == s
+@test Dates.Millisecond("1") == ms
+@test_throws ErrorException Dates.Year("1.0")
