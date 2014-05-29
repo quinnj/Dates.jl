@@ -11,6 +11,8 @@ for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
     @eval $p(x::$p) = x
     # Convenience method for show()
     @eval _units(x::$p) = " " * lowercase(string($p)) * (abs(value(x)) == 1 ? "" : "s")
+    # periodisless
+    @eval periodisless(x::$p,y::$p) = value(x) < value(y)
     # String parsing (mainly for IO code)
     @eval $p(x::String) = $p(parseint(x))
 end
