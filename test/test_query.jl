@@ -27,6 +27,18 @@ for (i,dt) in enumerate([jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec])
     @test Dates.dayabbr(dt) == dows[i][1:3]
 end
 
+# Customizing locale
+const french_daysofweek = [1=>"Lundi",2=>"Mardi",3=>"Mercredi",4=>"Jeudi",
+                           5=>"Vendredi",6=>"Samedi",7=>"Dimanche"]
+Dates.DAYSOFWEEK["french"] = french_daysofweek
+@test Dates.dayname(nov;locale="french") == "Lundi"
+@test Dates.dayname(jan;locale="french") == "Mardi"
+@test Dates.dayname(dec;locale="french") == "Mercredi"
+@test Dates.dayname(apr;locale="french") == "Jeudi"
+@test Dates.dayname(jun;locale="french") == "Vendredi"
+@test Dates.dayname(feb;locale="french") == "Samedi"
+@test Dates.dayname(may;locale="french") == "Dimanche"
+
 @test Dates.daysinmonth(2000,1) == 31
 @test Dates.daysinmonth(2000,2) == 29
 @test Dates.daysinmonth(2000,3) == 31

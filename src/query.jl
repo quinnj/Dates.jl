@@ -23,12 +23,14 @@ dayofyear(y,m,d) = MONTHDAYS2[m] + d + (m > 2 && isleap(y))
 ### Days of the Week
 const Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday = 1,2,3,4,5,6,7
 const Mon,Tue,Wed,Thu,Fri,Sat,Sun = 1,2,3,4,5,6,7
-const DAYSOFWEEK = [1=>"Monday",2=>"Tuesday",3=>"Wednesday",
-                    4=>"Thursday",5=>"Friday",6=>"Saturday",7=>"Sunday"]
-const DAYSOFWEEKABBR = [1=>"Mon",2=>"Tue",3=>"Wed",
-                        4=>"Thu",5=>"Fri",6=>"Sat",7=>"Sun"]
-dayname(dt::TimeType) = DAYSOFWEEK[dayofweek(dt)]
-dayabbr(dt::TimeType) = DAYSOFWEEKABBR[dayofweek(dt)]
+const english_daysofweek = [1=>"Monday",2=>"Tuesday",3=>"Wednesday",
+                            4=>"Thursday",5=>"Friday",6=>"Saturday",7=>"Sunday"]
+const DAYSOFWEEK = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweek]
+const english_daysofweekabbr = [1=>"Mon",2=>"Tue",3=>"Wed",
+                                4=>"Thu",5=>"Fri",6=>"Sat",7=>"Sun"]
+const DAYSOFWEEKABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweekabbr]
+dayname(dt::TimeType;locale::String="english") = DAYSOFWEEK[locale][dayofweek(dt)]
+dayabbr(dt::TimeType;locale::String="english") = DAYSOFWEEKABBR[locale][dayofweek(dt)]
 
 dayofweek(dt::TimeType) = dayofweek(days(dt))
 
@@ -68,14 +70,16 @@ end
 const January,February,March,April,May,June = 1,2,3,4,5,6
 const July,August,September,October,November,December = 7,8,9,10,11,12
 const Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec = 1,2,3,4,5,6,7,8,9,10,11,12
-const MONTHS = [1=>"January",2=>"February",3=>"March",4=>"April",
-                5=>"May",6=>"June",7=>"July",8=>"August",9=>"September",
-                10=>"October",11=>"November",12=>"December"]
-const MONTHSABBR = [1=>"Jan",2=>"Feb",3=>"Mar",4=>"Apr",
-                    5=>"May",6=>"Jun",7=>"Jul",8=>"Aug",9=>"Sep",
-                    10=>"Oct",11=>"Nov",12=>"Dec"]
-monthname(dt::TimeType) = MONTHS[month(dt)]
-monthabbr(dt::TimeType) = MONTHSABBR[month(dt)]
+const english_months = [1=>"January",2=>"February",3=>"March",4=>"April",
+                        5=>"May",6=>"June",7=>"July",8=>"August",9=>"September",
+                        10=>"October",11=>"November",12=>"December"]
+const MONTHS = (UTF8String=>Dict{Int,UTF8String})["english"=>english_months]
+const englishabbr_months = [1=>"Jan",2=>"Feb",3=>"Mar",4=>"Apr",
+                            5=>"May",6=>"Jun",7=>"Jul",8=>"Aug",9=>"Sep",
+                            10=>"Oct",11=>"Nov",12=>"Dec"]
+const MONTHSABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>englishabbr_months]
+monthname(dt::TimeType;locale::String="english") = MONTHS[locale][month(dt)]
+monthabbr(dt::TimeType;locale::String="english") = MONTHSABBR[locale][month(dt)]
 
 daysinmonth(dt::TimeType) = daysinmonth(yearmonth(dt)...)
 
@@ -108,4 +112,7 @@ dayofquarter(dt::TimeType) = dayofyear(dt) - QUARTERDAYS[quarterofyear(dt)]
 export dayofweek, isleap, daysinmonth, daysinyear, dayofyear, dayname, dayabbr,
         ismonday, istuesday, iswednesday, isthursday, isfriday, issaturday, issunday,
         dayofweekofmonth, daysofweekinmonth, monthname, monthabbr,
-        quarterofyear, dayofquarter
+        quarterofyear, dayofquarter,
+        January, February, March, April, May, June,
+        July, August, September, October, November, December,
+        Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
