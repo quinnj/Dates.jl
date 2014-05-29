@@ -274,3 +274,23 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test Dates.Second("1") == s
 @test Dates.Millisecond("1") == ms
 @test_throws ErrorException Dates.Year("1.0")
+
+dt = Dates.DateTime(2014)
+@test typeof(Dates.Year(dt)) <: Dates.Year
+@test typeof(Dates.Month(dt)) <: Dates.Month
+@test typeof(Dates.Week(dt)) <: Dates.Week
+@test typeof(Dates.Day(dt)) <: Dates.Day
+@test typeof(Dates.Hour(dt)) <: Dates.Hour
+@test typeof(Dates.Minute(dt)) <: Dates.Minute
+@test typeof(Dates.Second(dt)) <: Dates.Second
+@test typeof(Dates.Millisecond(dt)) <: Dates.Millisecond
+
+# Default values
+@test Dates.default(Dates.Year) == y
+@test Dates.default(Dates.Month) == m
+@test Dates.default(Dates.Week) == w
+@test Dates.default(Dates.Day) == d
+@test Dates.default(Dates.Hour) == zero(Dates.Hour)
+@test Dates.default(Dates.Minute) == zero(Dates.Minute)
+@test Dates.default(Dates.Second) == zero(Dates.Second)
+@test Dates.default(Dates.Millisecond) == zero(Dates.Millisecond)
