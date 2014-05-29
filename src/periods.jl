@@ -11,8 +11,6 @@ for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
     @eval $p(x::$p) = x
     # Convenience method for show()
     @eval _units(x::$p) = " " * lowercase(string($p)) * (abs(value(x)) == 1 ? "" : "s")
-    # Don't allow misuse of Periods on Date/DateTime
-    @eval $p(x::TimeType) = throw(ArgumentError("$($p)() is for constructing the $($p) type. Use $(lowercase(string($p)))(dt) as accessor"))
     # String parsing (mainly for IO code)
     @eval $p(x::String) = $p(parseint(x))
 end
@@ -112,3 +110,13 @@ function (+)(x::TimeType,y::CompoundPeriod)
     return x
 end
 (+)(x::CompoundPeriod,y::TimeType) = y + x
+
+# Periods from TimeTypes
+Year(x::TimeType) = Year(year(x))
+Month(x::TimeType) = Month(month(x))
+Week(x::TimeType) = Week(week(x))
+Day(x::TimeType) = Day(day(x))
+Hour(x::TimeType) = Hour(hour(x))
+Minute(x::TimeType) = Minute(minute(x))
+Second(x::TimeType) = Second(second(x))
+Millisecond(x::TimeType) = Millisecond(millisecond(x))
