@@ -94,7 +94,7 @@ function Date(y::Int64,m::Int64=1,d::Int64=1)
 end
 
 # Convenience constructors from Periods
-function DateTime(y::Year=Year(1),m::Month=Month(1),d::Day=Day(1),
+function DateTime(y::Year,m::Month=Month(1),d::Day=Day(1),
                   h::Hour=Hour(0),mi::Minute=Minute(0),
                   s::Second=Second(0),ms::Millisecond=Millisecond(0))
     return DateTime(value(y),value(m),value(d),
@@ -103,6 +103,7 @@ end
 DateTime(x::Period...) = throw(ArgumentError("Required argument order is DateTime(y[,m,d,h,mi,s,ms])"))
 
 Date(y::Year,m::Month=Month(1),d::Day=Day(1)) = Date(value(y),value(m),value(d))
+#TODO: could maybe make this work with sort!(x,rev=true,lt=periodless)
 Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y[,m,d])"))
 
 # Fallback constructors
