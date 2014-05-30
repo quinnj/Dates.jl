@@ -116,10 +116,24 @@ function Base.parse(x::String,df::DateFormat)
     return sort!(periods,rev=true,lt=Dates.periodisless)
 end
 
-function format(dt::Date,df::DateFormat)
+slotformat(slot::Slot{Year},dt) = lpad(string(value(slot.period(dt))),slot.width,"0")[(end-slot.width+1):end]
+slotformat(slot,dt) = lpad(string(value(slot.period(dt))),slot.width,"0")
+function slotformat(slot::Slot{Month},dt)
+    if slot.option == 0
+        return lpad(month(dt),slot.width,"0")
+    elseif slot.option == 1
+        return VALUETOMONTHABBR[slot.locale][month(dt)]
+    else
+        return VALUETOMONTH[slot.locale][month(dt)]
+    end
+end
+slotformat(slot::Slot{Millisecond},dt) = millisecond(dt) == 0 ? ".0"^slot.width : string(millisecond(dt)/1000.0)[3:end]
+
+function format(dt::TimeType,df::DateFormat)
     f = ""
     for slot in df.slots
-        f *= df.trans[slot.i] * lpad(string(Dates.value(slot.p(dt))),slot.width,"0")[(end-slot.width+1):end]
+        f *= slotformat(slot,dt)
+        f *= typeof(df.trans[slot.i]) <: Regex ? "" : df.trans[slot.i]
     end
     return f
 end
@@ -129,10 +143,12 @@ const ISODateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.sZ")
 const ISODateFormat = DateFormat("yyyy-mm-dd")
 
 DateTime(dt::String,format::String;locale::String="english") = DateTime(dt,DateFormat(format,locale))
-DateTime(dt::String,df::DateFormat=ISODateFormat) = DateTime(parse(dt,df)...)
+DateTime(dt::String,df::DateFormat=ISODateTimeFormat) = DateTime(parse(dt,df)...)
 
 Date(dt::String,format::String;locale::String="english") = Date(dt,DateFormat(format,locale))
 Date(dt::String,df::DateFormat=ISODateFormat) = Date(parse(dt,df)...)
+
+format(dt::TimeType,f::String;locale::String="english") = format(dt,DateFormat(f,locale))
 
 # vectorized
 DateTime{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = DateTime(y,DateFormat(format,locale))
@@ -142,6 +158,14 @@ end
 Date{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = Date(y,DateFormat(format,locale))
 function Date{T<:String}(y::AbstractArray{T},x::DateFormat=ISODateFormat)
     return reshape([Date(parse(y[i],f)...) for i in 1:length(y)], size(y))
+end
+
+format{T<:TimeType}(y::AbstractArray{T},format::String;locale::String="english") = format(y,DateFormat(format,locale))
+function format(y::AbstractArray{Date},df::DateFormat=ISODateFormat)
+    return reshape([format(y[i],df) for i in 1:length(y)], size(y))
+end
+function format(y::AbstractArray{DateTime},df::DateFormat=ISODateTimeFormat)
+    return reshape([format(y[i],df) for i in 1:length(y)], size(y))
 end
 
 export ISODateTimeFormat, ISODateFormat, DateFormat

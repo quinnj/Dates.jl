@@ -13,9 +13,8 @@ include("test_io.jl")
 
 
 #TODO
- #formatting/parsing
- #test coverage/coveralls.io
  #docs update
+ #Timezones.jl
 
 #NEED TESTS
  
@@ -24,7 +23,7 @@ include("test_io.jl")
  #round(dt,period)
  #add(dt,y,m,d,h,mi,s,ms); sub(dt,y,m,d,h,mi,s,ms); many ariths at once?
  #conversions: ruby? python? javascript? etc.
- #make TimeStamp fully parameterized (Instant, TimeZone, Calendar)
-  #have datetime field + nanosecond field?
+ #make TimeStamp fully parameterized (Instant, Calendar)
+  #have datetime field + nanosecond + timezone field?
  #d"2014-01-01"
  #dt"2014-01-01"
