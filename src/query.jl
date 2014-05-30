@@ -25,12 +25,12 @@ const Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday = 1,2,3,4,5,6,7
 const Mon,Tue,Wed,Thu,Fri,Sat,Sun = 1,2,3,4,5,6,7
 const english_daysofweek = [1=>"Monday",2=>"Tuesday",3=>"Wednesday",
                             4=>"Thursday",5=>"Friday",6=>"Saturday",7=>"Sunday"]
-const DAYSOFWEEK = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweek]
+const VALUETODAYOFWEEK = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweek]
 const english_daysofweekabbr = [1=>"Mon",2=>"Tue",3=>"Wed",
                                 4=>"Thu",5=>"Fri",6=>"Sat",7=>"Sun"]
-const DAYSOFWEEKABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweekabbr]
-dayname(dt::TimeType;locale::String="english") = DAYSOFWEEK[locale][dayofweek(dt)]
-dayabbr(dt::TimeType;locale::String="english") = DAYSOFWEEKABBR[locale][dayofweek(dt)]
+const VALUETODAYOFWEEKABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>english_daysofweekabbr]
+dayname(dt::TimeType;locale::String="english") = VALUETODAYOFWEEK[locale][dayofweek(dt)]
+dayabbr(dt::TimeType;locale::String="english") = VALUETODAYOFWEEKABBR[locale][dayofweek(dt)]
 
 dayofweek(dt::TimeType) = dayofweek(days(dt))
 
@@ -73,13 +73,13 @@ const Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec = 1,2,3,4,5,6,7,8,9,10,11,
 const english_months = [1=>"January",2=>"February",3=>"March",4=>"April",
                         5=>"May",6=>"June",7=>"July",8=>"August",9=>"September",
                         10=>"October",11=>"November",12=>"December"]
-const MONTHS = (UTF8String=>Dict{Int,UTF8String})["english"=>english_months]
+const VALUETOMONTH = (UTF8String=>Dict{Int,UTF8String})["english"=>english_months]
 const englishabbr_months = [1=>"Jan",2=>"Feb",3=>"Mar",4=>"Apr",
                             5=>"May",6=>"Jun",7=>"Jul",8=>"Aug",9=>"Sep",
                             10=>"Oct",11=>"Nov",12=>"Dec"]
-const MONTHSABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>englishabbr_months]
-monthname(dt::TimeType;locale::String="english") = MONTHS[locale][month(dt)]
-monthabbr(dt::TimeType;locale::String="english") = MONTHSABBR[locale][month(dt)]
+const VALUETOMONTHABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>englishabbr_months]
+monthname(dt::TimeType;locale::String="english") = VALUETOMONTH[locale][month(dt)]
+monthabbr(dt::TimeType;locale::String="english") = VALUETOMONTHABBR[locale][month(dt)]
 
 daysinmonth(dt::TimeType) = daysinmonth(yearmonth(dt)...)
 

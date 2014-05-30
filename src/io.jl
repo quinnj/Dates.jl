@@ -28,8 +28,8 @@ const english = (UTF8String=>Int)["january"=>1,"february"=>2,"march"=>3,"april"=
 const abbrenglish = (UTF8String=>Int)["jan"=>1,"feb"=>2,"mar"=>3,"apr"=>4,
                      "may"=>5,"jun"=>6,"jul"=>7,"aug"=>8,"sep"=>9,
                      "oct"=>10,"nov"=>11,"dec"=>12]
-const MONTHLOCALE = (UTF8String=>Dict{UTF8String,Int})["english"=>english]
-const MONTHLOCALEABBR = (UTF8String=>Dict{UTF8String,Int})["english"=>abbrenglish]
+const MONTHTOVALUE = (UTF8String=>Dict{UTF8String,Int})["english"=>english]
+const MONTHTOVALUEABBR = (UTF8String=>Dict{UTF8String,Int})["english"=>abbrenglish]
 
 # Date/DateTime Parsing
 abstract Slot{P<:Period} <: Dates.AbstractTime
@@ -85,9 +85,9 @@ function slotparse(slot::Slot{Month},x)
         ismatch(r"\D",x) && throw(SLOTERROR)
         return Month(x)
     elseif slot.option == 1
-        return Month(MONTHLOCALEABBR[slot.locale][lowercase(x)])
+        return Month(MONTHTOVALUEABBR[slot.locale][lowercase(x)])
     else
-        return Month(MONTHLOCALE[slot.locale][lowercase(x)])
+        return Month(MONTHTOVALUE[slot.locale][lowercase(x)])
     end
 end
 slotparse(slot::Slot{Millisecond},x) = !ismatch(r"\D",x) ? slot.period(parsefloat("."*x)*1000.0) : throw(SLOTERROR)

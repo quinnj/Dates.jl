@@ -30,7 +30,7 @@ end
 # Customizing locale
 const french_daysofweek = [1=>"Lundi",2=>"Mardi",3=>"Mercredi",4=>"Jeudi",
                            5=>"Vendredi",6=>"Samedi",7=>"Dimanche"]
-Dates.DAYSOFWEEK["french"] = french_daysofweek
+Dates.VALUETODAYOFWEEK["french"] = french_daysofweek
 @test Dates.dayname(nov;locale="french") == "Lundi"
 @test Dates.dayname(jan;locale="french") == "Mardi"
 @test Dates.dayname(dec;locale="french") == "Mercredi"
