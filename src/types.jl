@@ -100,11 +100,33 @@ function DateTime(y::Year,m::Month=Month(1),d::Day=Day(1),
     return DateTime(value(y),value(m),value(d),
                         value(h),value(mi),value(s),value(ms))
 end
-DateTime(x::Period...) = throw(ArgumentError("Required argument order is DateTime(y[,m,d,h,mi,s,ms])"))
 
 Date(y::Year,m::Month=Month(1),d::Day=Day(1)) = Date(value(y),value(m),value(d))
-#TODO: could maybe make this work with sort!(x,rev=true,lt=periodless)
-Date(x::Period...) = throw(ArgumentError("Required argument order is Date(y[,m,d])"))
+
+# To allow any order/combination of Periods
+function DateTime(periods::Period...)
+    y = Year(1); m = Month(1); d = Day(1)
+    h = Hour(0); mi = Minute(0); s = Second(0); ms = Millisecond(0)
+    for p in periods
+        typeof(p) <: Year && (y = p)
+        typeof(p) <: Month && (m = p)
+        typeof(p) <: Day && (d = p)
+        typeof(p) <: Hour && (h = p)
+        typeof(p) <: Minute && (mi = p)
+        typeof(p) <: Second && (s = p)
+        typeof(p) <: Millisecond && (ms = p)
+    end
+    return DateTime(y,m,d,h,mi,s,ms)
+end
+function Date(periods::Period...)
+    y = Year(1); m = Month(1); d = Day(1)
+    for p in periods
+        typeof(p) <: Year && (y = p)
+        typeof(p) <: Month && (m = p)
+        typeof(p) <: Day && (d = p)
+    end
+    return Date(y,m,d)
+end
 
 # Fallback constructors
 _c(x) = convert(Int64,x)
