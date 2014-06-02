@@ -106,6 +106,7 @@ function Base.parse(x::String,df::DateFormat)
     #TODO: strip timezone info as well
     x = strip(replace(x, r"#.*$", ""))
     isempty(x) && throw(ArgumentError("Cannot parse empty string"))
+    (typeof(df.slots[1]) <: DelimitedSlot && first(search(x,df.trans[1])) == 0) && throw(ArgumentError("Delimiter mismsatch. Couldn't find first delimter, \"$(df.trans[1])\", in date string"))
     periods = Period[]
     cursor = 1
     for slot in df.slots

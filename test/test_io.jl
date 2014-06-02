@@ -242,10 +242,11 @@ f = "y m d"
 @test Dates.Date("1 1 32",f) == Dates.Date(1,2,1)
 @test Dates.Date(" 1 1 32",f) == Dates.Date(1,2,1)
 @test_throws ArgumentError Dates.Date("# 1 1 32",f)
-@test Dates.Date("1",f) == Dates.Date(1)
+# can't find 1st space delimiter,s o fails
+@test_throws ArgumentError Dates.Date("1",f)
 @test Dates.Date("1 2",f) == Dates.Date(1,2)
-# different delimiter, so it tries to parse year, fails, and defaults to Year(1)
-@test Dates.Date("2000/1",f) == Dates.Date(1)
+# can't find space delimiter (finds '/'), so fails
+@test_throws ArgumentError Dates.Date("2000/1",f)
 
 @test Dates.DateTime("20140529 120000","yyyymmdd HHMMSS") == Dates.DateTime(2014,5,29,12)
 
