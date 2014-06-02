@@ -43,27 +43,13 @@ end
 
 function firstdayofquarter(dt::Date)
     y,m = yearmonth(dt)
-    if m < 4
-        return Date(y,1,1)
-    elseif m < 7
-        return Date(y,4,1)
-    elseif m < 10
-        return Date(y,7,1)
-    else
-        return Date(y,10,1)
-    end
+    mm = m < 4 ? 1 : m < 7 ? 4 : m < 10 ? 7 : 10
+    return Date(y,mm,1)
 end
 function lastdayofquarter(dt::Date)
     y,m = yearmonth(dt)
-    if m < 4
-        return Date(y,3,31)
-    elseif m < 7
-        return Date(y,6,30)
-    elseif m < 10
-        return Date(y,9,30)
-    else
-        return Date(y,12,31)
-    end
+    mm,d = m < 4 ? (3,31) : m < 7 ? (6,30) : m < 10 ? (9,30) : (12,31)
+    return Date(y,mm,d)
 end
 firstdayofquarter(dt::DateTime) = DateTime(firstdayofquarter(Date(dt)))
 lastdayofquarter(dt::DateTime) = DateTime(lastdayofquarter(Date(dt)))
@@ -123,7 +109,6 @@ function DateTime(func::Function,y,m,d,h,mi,s;step::Period=Millisecond(1),negate
 end
 
 # Return the next TimeType that falls on dow
-# "same" indicates whether the current date can be considered or not
 ISDAYOFWEEK = [Mon=>DateFunction(ismonday,false,Date(0)),
                Tue=>DateFunction(istuesday,false,Date(0)),
                Wed=>DateFunction(iswednesday,false,Date(0)),
@@ -132,6 +117,7 @@ ISDAYOFWEEK = [Mon=>DateFunction(ismonday,false,Date(0)),
                Sat=>DateFunction(issaturday,false,Date(0)),
                Sun=>DateFunction(issunday,false,Date(0))]
 
+# "same" indicates whether the current date can be considered or not
 tonext(dt::TimeType,dow::Int;same::Bool=false) = adjust(ISDAYOFWEEK[dow],same ? dt : dt+Day(1),Day(1),7)
 # Return the next TimeType where func evals true using step in incrementing
 function tonext(func::Function,dt::TimeType;step::Period=Day(1),negate::Bool=false,limit::Int=10000,same::Bool=false)
