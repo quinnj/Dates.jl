@@ -31,8 +31,8 @@ Base.typemin{P<:Period}(::Type{P}) = P(typemin(Int64))
 Base.typemax{P<:Period}(::Type{P}) = P(typemax(Int64))
 
 # Default values (as used by TimeTypes)
-default{T<:DatePeriod}(p::Type{T}) = one(p)
-default{T<:TimePeriod}(p::Type{T}) = zero(p)
+default{T<:DatePeriod}(p::Union(T,Type{T})) = one(p)
+default{T<:TimePeriod}(p::Union(T,Type{T})) = zero(p)
 
 (-){P<:Period}(x::P) = P(-value(x))
 Base.isless{P<:Period}(x::P,y::P) = isless(value(x),value(y))
