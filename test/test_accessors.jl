@@ -18,7 +18,7 @@
 @test Dates.yearmonthday(1) == (1,1,1)
 @test Dates.yearmonth(1) == (1,1)
 @test Dates.monthday(1) == (1,1)
-# _year, _month, and _day return the indivial components
+# year, month, and day return the indivial components
 # of yearmonthday, avoiding additional calculations when possible
 @test Dates.year(-1) == 0
 @test Dates.month(-1) == 12
