@@ -10,12 +10,12 @@ Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
 @vectorize_1arg Date DateTime
 
 ### External Conversions
-const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00 UTC
+const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00Z
 function unix2date(x)
     rata = UNIXEPOCH + int64(1000*x)
     return DateTime(UTM(rata))
 end
-# Returns unix seconds since 1970-01-01T00:00:00 UTC
+# Returns unix seconds since 1970-01-01T00:00:00Z
 date2unix(dt::DateTime) = (value(dt) - UNIXEPOCH)/1000.0
 now() = unix2date(time())
 
@@ -28,7 +28,7 @@ function julian2date(f)
     rata = JULIANEPOCH + int64(86400000*f)
     return DateTime(UTM(rata))
 end
-# Returns # of julian days since -4713-11-24T12:00:00 UTC
+# Returns # of julian days since -4713-11-24T12:00:00Z
 date2julian(dt::DateTime) = (value(dt) - JULIANEPOCH)/86400000.0
 
 export unix2date, date2unix, now, ratadays2date, date2ratadays, julian2date, date2julian
