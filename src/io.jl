@@ -139,7 +139,7 @@ function format(dt::TimeType,df::DateFormat)
 end
 
 # UI
-const ISODateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.sZ")
+const ISODateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SSZ")
 const ISODateFormat = DateFormat("yyyy-mm-dd")
 
 DateTime(dt::String,format::String;locale::String="english") = DateTime(dt,DateFormat(format,locale))
