@@ -1,6 +1,6 @@
 # Dates
 
-[![Build Status](https://travis-ci.org/karbarcca/Dates.jl.png)](https://travis-ci.org/karbarcca/Dates.jl)
+[![Build Status](https://travis-ci.org/quinnj/Dates.jl.png)](https://travis-ci.org/quinnj/Dates.jl)
 
 
 A Date and DateTime implementation for Julia
@@ -16,4 +16,4 @@ julia> using Dates # Loads Dates code into current julia session
 ```
 
 
-* Checkout the updated [Dates manual](https://github.com/karbarcca/Dates.jl/wiki/Dates-Documentation)
+* Checkout the updated [Dates manual](https://github.com/quinnj/Dates.jl/wiki/Dates-Documentation)

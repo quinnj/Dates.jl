@@ -102,7 +102,7 @@ function getslot(x,slot::DelimitedSlot,df,cursor)
 end
 getslot(x,slot,df,cursor) = (cursor+slot.width, Dates.slotparse(slot,x[cursor:(cursor+slot.width-1)]))
 
-function Base.parse(x::String,df::DateFormat)
+function parse(x::String,df::DateFormat)
     #TODO: strip timezone info as well
     x = strip(replace(x, r"#.*$", ""))
     isempty(x) && throw(ArgumentError("Cannot parse empty string"))
