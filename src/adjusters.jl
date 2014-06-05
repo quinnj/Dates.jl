@@ -88,6 +88,9 @@ end
 function Date(func::Function,y,m;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
     return adjust(DateFunction(func,negate,Date(y,m)),Date(y,m),step,limit)
 end
+function Date(func::Function,y,m,d;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    return adjust(DateFunction(func,negate,Date(y,m,d)),Date(y,m,d),step,limit)
+end
 
 function DateTime(func::Function,y;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
     return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y),step,limit)
