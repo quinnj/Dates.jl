@@ -71,7 +71,7 @@ em = a:Dates.Date(2012,12,31)
 
 c = Dates.Date(2013,6,1)
 @test length(a:Dates.Month(1):c) == 6
-@test [a:Dates.Month(1):c] == [a + Dates.Month(i) for i in 0:5]
+@test [a:Dates.Month(1):c] == [a + Dates.Month(1)*i for i in 0:5]
 @test [a:Dates.Month(2):Dates.Date(2013,1,2)] == [a]
 @test [c:Dates.Month(-1):a] == reverse([a:Dates.Month(1):c])
 
@@ -109,3 +109,7 @@ d = Dates.Date(2020,1,1)
 @test last(range(Dates.Date(2001),365)) == Dates.Date(2001,12,31)
 @test last(range(Dates.Date(2000),367)) == last(range(Dates.Date(2000),Dates.Month(12),2)) == last(range(Dates.Date(2000),Dates.Year(1),2))
 @test last(range(Dates.DateTime(2000),Dates.Day(366),2)) == last(range(Dates.DateTime(2000),Dates.Hour(8784),2))
+
+# Issue 5
+lastdaysofmonth = [Dates.Date(2014,i,Dates.daysinmonth(2014,i)) for i=1:12]
+@test [Date(2014,1,31):Month(1):Date(2015)] == lastdaysofmonth

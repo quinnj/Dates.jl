@@ -17,13 +17,11 @@ function Base.length{T<:TimeType,P<:Period}(r::StepRange{T,P})
     isempty(r) && return 0
     start,stop = r.start > r.stop ? (r.stop,r.start) : (r.start,r.stop)
     step = r.step < zero(r.step) ? -r.step : r.step
-    t = start
-    len = 1
-    while (t+step) <= stop
-        t += step
-        len += 1
+    i = 0
+    while (start+step*i) <= stop
+        i += 1
     end
-    return len
+    return i
 end
 #Period overflow detection
 function Base.length{T<:Period}(r::StepRange{T})
@@ -60,11 +58,11 @@ function Base.steprem(start::TimeType,stop::TimeType,step::Period)
     start,stop = start > stop ? (stop,start) : (start,stop)
     step = step < zero(step) ? -step : step
     toobig(start,stop,step) && throw(ArgumentError("Desired range is too big"))
-    t = start
-    while (t+step) <= stop
-        t += step
+    i = 1
+    while (start+step*i) <= stop
+        i += 1
     end
-    return stop - t
+    return stop - (start+step*(i-1))
 end
 
 # Specialize for Date-Day, DateTime-Millisecond?
@@ -77,3 +75,7 @@ function in{T<:TimeType,S<:Period}(x, r::StepRange{T,S})
     end
     return false
 end
+
+Base.start(r::StepRange{Date}) = 0
+Base.next(r::StepRange{Date}, i) = (r.start+r.step*i,i+1)
+Base.done{S}(r::StepRange{Date,S}, i) = length(r) <= i #r.start+r.step*i == r.stop || ((r.step>zero(S))&&r.start>r.stop)
