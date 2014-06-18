@@ -32,9 +32,9 @@ const MONTHTOVALUE = (UTF8String=>Dict{UTF8String,Int})["english"=>english]
 const MONTHTOVALUEABBR = (UTF8String=>Dict{UTF8String,Int})["english"=>abbrenglish]
 
 # Date/DateTime Parsing
-abstract Slot{P<:Period} <: Dates.AbstractTime
+abstract Slot{P<:AbstractTime} <: AbstractTime
 
-immutable DelimitedSlot{P<:Period} <: Slot{P}
+immutable DelimitedSlot{P<:AbstractTime} <: Slot{P}
     i::Int
     period::Type{P}
     width::Int
@@ -42,7 +42,7 @@ immutable DelimitedSlot{P<:Period} <: Slot{P}
     locale::String
 end
 
-immutable FixedWidthSlot{P<:Period} <: Slot{P}
+immutable FixedWidthSlot{P<:AbstractTime} <: Slot{P}
     i::Int
     period::Type{P}
     width::Int

@@ -214,8 +214,8 @@ f = "dduuuyyyy"
 @test Dates.Date("01Dec2009",f) == Dates.Date(2009,12,1)
 @test Dates.format(Dates.Date(2009,12,1),f) == "01Dec2009"
 f = "duy"
-const globex = ["f"=>Jan,"g"=>Feb,"h"=>Mar,"j"=>Apr,"k"=>May,"m"=>Jun,
-                "n"=>Jul,"q"=>Aug,"u"=>Sep,"v"=>Oct,"x"=>Nov,"z"=>Dec]
+const globex = ["f"=>Dates.Jan,"g"=>Dates.Feb,"h"=>Dates.Mar,"j"=>Dates.Apr,"k"=>Dates.May,"m"=>Dates.Jun,
+                "n"=>Dates.Jul,"q"=>Dates.Aug,"u"=>Dates.Sep,"v"=>Dates.Oct,"x"=>Dates.Nov,"z"=>Dates.Dec]
 Dates.MONTHTOVALUEABBR["globex"] = globex
 Dates.VALUETOMONTHABBR["globex"] = [v=>uppercase(k) for (k,v) in globex]
 @test Dates.Date("1F4",f;locale="globex") + Dates.Year(2010) == Dates.Date(2014,1,1)
