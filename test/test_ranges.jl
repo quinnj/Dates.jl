@@ -112,4 +112,4 @@ d = Dates.Date(2020,1,1)
 
 # Issue 5
 lastdaysofmonth = [Dates.Date(2014,i,Dates.daysinmonth(2014,i)) for i=1:12]
-@test [Date(2014,4,30):Month(1):Date(2015,4)] == lastdaysofmonth
+@test [Date(2014,1,31):Dates.Month(1):Date(2015)] == lastdaysofmonth
