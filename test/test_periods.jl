@@ -176,6 +176,9 @@ test = ((((((((dt + y) - m) + w) - d) + h) - mi) + s) - ms)
 @test test == dt + (y - m + w - d + h - mi + s - ms)
 @test test == dt + y - m + w - d + (h - mi + s - ms)
 @test (dt + Dates.Year(4)) + Dates.Day(1) == dt + (Dates.Year(4) + Dates.Day(1))
+@test Dates.Date(2014,1,29) + Dates.Month(1) + Dates.Day(1) + Dates.Month(1) + Dates.Day(1) ==
+    Dates.Date(2014,1,29) + Dates.Day(1) + Dates.Month(1) + Dates.Month(1) + Dates.Day(1)
+@test Dates.Date(2014,1,29) + Dates.Month(1) + Dates.Day(1) == Dates.Date(2014,1,29) + Dates.Day(1) + Dates.Month(1)
 # traits
 @test Dates._units(Dates.Year(0)) == " years"
 @test Dates._units(Dates.Year(1)) == " year"
