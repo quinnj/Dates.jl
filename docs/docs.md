@@ -14,9 +14,9 @@ TimeTypes
 
 The `Dates` module provides two `TimeType` types: `Date` and `DateTime`, representing different levels of precision/resolution. The `Date` type has a day precision while the `DateTime` type provides a millisecond precision. The motivation for distinct types is simple, some operations are much simpler, both in terms of code and mental reasoning, when the complexities of greater precision don't have to be dealt with. For example, since the `Date` type has a "day-precision" (i.e. no hours, minutes, or seconds), it means that normal considerations for time zones, daylight savings/summer time, and leap seconds are unneccesary. Users should take care to think about the level precision they will actually require and choose a `TimeType` appropriately, remembering that the simpler the date type, the faster, more efficient, and less complex the code will be.
 
-Both `Date` and `DateTime` are immutable, and wrap `Int64` `UTInstant` types, which represent continuously increasing machine timelines based fundamentally on the UT second<sup>[1]</sup>. A `Date` is represented by "yyyy-mm-dd", while a `DateTime` goes by the ISO standard "yyyy-mm-ddTHH:MM:SS.sZ". The `DateTime` type is "timezone-unaware" (in Python parlance) or can be considered a "LocalDateTime" (as in Java 8). Additional time zone functionality can be added through the `Timezones.jl` [package](https://github.com/quinnj/Timezones.jl/), which compiles the [Olsen Time Zone Database](http://www.iana.org/time-zones).
+Both `Date` and `DateTime` are immutable, and wrap `Int64` `UTInstant` types, which represent continuously increasing machine timelines based fundamentally on the UT second<sup>[1]</sup>. A `Date` is represented by "yyyy-mm-dd", while a `DateTime` goes by the ISO standard "yyyy-mm-ddTHH:MM:SS.sZ". The `DateTime` type is *timezone-unaware* (in Python parlance) or can be considered a *LocalDateTime* (as in Java 8). Additional time zone functionality can be added through the `Timezones.jl` [package](https://github.com/quinnj/Timezones.jl/), which compiles the [Olsen Time Zone Database](http://www.iana.org/time-zones).
 
-Both `Date` and `DateTime` are based on ISO 8601 standards. This means dates follow the proleptic Gregorian calendar, which means that the normal calendar we think of toady, which was implemented as it currently stands in 1582, is applied retroactively back through time. So even though the folks in 1582 fast-forwarded 10 days and didn't experience October 5-14, these are valid dates for the `ISOCalendar` (non-ISO implementations sometimes switch to the Julian calendar before Oct 14, 1582).
+Both `Date` and `DateTime` are based on ISO 8601 standards following the proleptic Gregorian calendar, which means that the normal calendar we think of toady, which was implemented as it currently stands in 1582, is applied retroactively back through time. So even though the folks in 1582 fast-forwarded 10 days and didn't experience October 5-14, these are valid dates for the `ISOCalendar` (non-ISO implementations sometimes switch to the Julian calendar before Oct 14, 1582).
 
 The ISO 8601 standard is also particular about BC/BCE dates. In common text, the date 1-12-31 BC/BCE was followed by 1-1-1 AD/CE, thus no year 0 exists. The ISO standard however states that 1 BC/BCE is year 0, so `0000-12-31` is the day before `0001-01-01`, and year `-0001` (yes, negative 1 for the year) is 2 BC/BCE, year `-0002` is 3 BC/BCE, etc.
 
@@ -52,16 +52,16 @@ Constructors
 
   julia> Date(2013,7,1)
   2013-07-01
-  
+
   julia> Date(Year(2013),Month(7),Day(1))
   2013-07-01
-  
+
   julia> Date(Month(7),Year(2013))
   2013-07-01
 ```
 `Date` or `DateTime` parsing is accomplished by the use of format strings. The easiest way to understand is to see some examples in action. Also refer to the function reference below for additional information::
 ```julia
-  
+
 ```
 Durations/Comparisons
 ---------------------
@@ -73,6 +73,18 @@ Finding the length of time between two `Date` or `DateTime` is straightforward. 
 
   julia> dt2 = Date(2000,2,1)
   2000-02-01
+
+  julia> dump(dt)
+  Date
+    instant: UTInstant{Day}
+      periods: Day
+        value: Int64 734562
+
+  julia> dump(dt2)
+  Date
+  instant: UTInstant{Day}
+    periods: Day
+      value: Int64 730151
 
   julia> dt > dt2
   true
@@ -91,6 +103,9 @@ Finding the length of time between two `Date` or `DateTime` is straightforward. 
 
   julia> dt - dt2
   4411 days
+
+  julia> dt2 - dt
+  -4411 days
 
   julia> dt = DateTime(2012,2,29)
   2012-02-29T00:00:00Z
@@ -111,13 +126,20 @@ The `Dates` module tries to follow the simple principle of trying to change as l
 
 Now just imagine that instead of 7-7-7, the slots are Year-Month-Day, or in our example, 2014-01-31. When you ask to add 1 month to this date, `Dates` increments the month slot, 2014-02-31, then lets the day number stay if it isn't greater than the last valid day of the new month; if it is (as in our case), it adjusts the day down to the last valid day (28). What are weird things about this approach (because any strategy you employ will have weirdness...)? Go ahead and add another month to our date, `2014-02-28 + Month(1) == 2014-03-28`. What? Were you expecting the last day of March? Nope, sorry, remember the 7-7-7 slots. As few slots as possible are going to change, so we first increment the month slot by 1, 2014-03-28, and boom, we're done because that's a valid date. The other ramification of this approach is an occasional loss in associativity (adding things in different orders results in different outcomes). For example:
 ```julia
-julia>(Date(2014,1,29)+Day(1)) + Month(1)
+julia> (Date(2014,1,29)+Day(1)) + Month(1)
 2014-02-28
 
-julia>(Date(2014,1,29)+Month(1)) + Day(1)
+julia> (Date(2014,1,29)+Month(1)) + Day(1)
 2014-03-01
 ```
-What's going on there? In the first line, we're adding 1 day to January 29th, which results in 2014-01-30; then we add 1 month, so we get 2014-02-30, which then adjusts down to 2014-02-28. In the second example, we add 1 month *first*, where we get 2014-02-29, which adjusts down to 2014-02-28, and *then* add 1 day, which finally results in 2014-03-01. Tricky? Perhaps. What do you need to remember? Don't try to get fancy by forcing associativity; just adding the periods naturally will almost always result in what you're looking for.
+What's going on there? In the first line, we're adding 1 day to January 29th, which results in 2014-01-30; then we add 1 month, so we get 2014-02-30, which then adjusts down to 2014-02-28. In the second example, we add 1 month *first*, where we get 2014-02-29, which adjusts down to 2014-02-28, and *then* add 1 day, which finally results in 2014-03-01. Tricky? Perhaps. What do you need to remember? Don't try to get fancy by forcing associativity. Another point to help in reasoning about Period arithmetic is that, in the presence of multiple Periods, `Dates` will always perform the operations based on the Period *types*, not their value or order, meaning `Year` will always be added first, then `Month`, then `Week`, etc. Hence the following *does* result in associativity::
+```julia
+julia> Date(2014,1,29) + Day(1) + Month(1)
+2014-03-01
+
+julia> Date(2014,1,29) + Month(1) + Day(1)
+2014-03-01
+```
 
 Query Functions
 ---------------
@@ -181,7 +203,7 @@ Function Reference
 .. function:: `DateTime(dt::String, [format::String=ISODateTimeFormat]; sep::String="")`
 
    Construct a DateTime type by parsing a `dt` string given a `format` string.
-   The default format string is `ISODateTimeFormat` which is how 
+   The default format string is `ISODateTimeFormat` which is how
    DateTime types are represented. The `sep` keyword specifies the substring that
    separates the date and time parts of a DateTime string. If no `sep` is provided,
    a best guess for a non-word character is sought that divides the date and time
@@ -199,7 +221,7 @@ Function Reference
    | `MM`            | 00         | Matches minutes
    | `SS`            | 00         | Matches seconds
    | `.s`            | .500       | Matches milliseconds
-   
+
 .. function:: `Date(y, [m, [d,])`
 
    Construct a Date type by parts. Arguments must be of type
@@ -213,7 +235,7 @@ Function Reference
 .. function:: `Date(dt::String, [format::String=ISODateTimeFormat]; sep::String="")`
 
    Construct a Date type by parsing a `dt` string given a `format` string.
-   The default format string is `ISODateFormat` which is how 
+   The default format string is `ISODateFormat` which is how
    Date types are represented. Same codes and rules for DateTime types
    apply for Dates.
 .. currentmodule:: Base.Time
@@ -251,7 +273,7 @@ Period Constructors
 
 .. function:: `Millisecond(y::Integer)`
 
-   Construct a `Millisecond` Period type with the given `Integer` value.      
+   Construct a `Millisecond` Period type with the given `Integer` value.
 
 Accessor Functions
 ------------------
@@ -342,7 +364,7 @@ Date Functions
 .. function:: `daysofweekinmonth(dt::TimeType) -> 4 or 5`
 
    Returns 4 or 5, corresponding to the total number of days of the week
-   for the given Date or DateDates. 
+   for the given Date or DateDates.
 
 .. function:: `firstdayofweek(dt::TimeType) -> TimeType`
 
@@ -362,7 +384,7 @@ Date Functions
 
    `recur` takes a boolean function as 1st argument (or used with a `do` block), and will
    apply the boolean function for each Date or DateTime from `start` to `stop` incrementing
-   by `step`. If the boolean function returns `true`, the evaluated Date or DateTime is 
+   by `step`. If the boolean function returns `true`, the evaluated Date or DateTime is
    "included" in the returned `Array`. The `inclusion` keyword specifies whether the boolean
    function will "include" or "exclude" the TimeType from the set.
 
@@ -382,7 +404,7 @@ Conversion Functions
 
 .. function:: `julian2date(j) -> DateTime`
 
-   Takes the number of Julian calendar days since epoch 
+   Takes the number of Julian calendar days since epoch
    `-4713-11-24T12:00:00` and returns the corresponding DateDates.
 .. function:: `date2julian(dt::DateTime) -> Float64`
 
