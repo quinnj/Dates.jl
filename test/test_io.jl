@@ -7,11 +7,11 @@
 @test string(Dates.Date(-1,1,1)) == "-0001-01-01" # January 1st, 2 BC/BCE
 @test string(Dates.Date(-1000000,1,1)) == "-1000000-01-01"
 @test string(Dates.Date(1000000,1,1)) == "1000000-01-01"
-@test string(Dates.DateTime(2000,1,1,0,0,0,1)) == "2000-01-01T00:00:00.001Z"
-@test string(Dates.DateTime(2000,1,1,0,0,0,2)) == "2000-01-01T00:00:00.002Z"
-@test string(Dates.DateTime(2000,1,1,0,0,0,500)) == "2000-01-01T00:00:00.5Z"
-@test string(Dates.DateTime(2000,1,1,0,0,0,998)) == "2000-01-01T00:00:00.998Z"
-@test string(Dates.DateTime(2000,1,1,0,0,0,999)) == "2000-01-01T00:00:00.999Z"
+@test string(Dates.DateTime(2000,1,1,0,0,0,1)) == "2000-01-01T00:00:00.001+00:00"
+@test string(Dates.DateTime(2000,1,1,0,0,0,2)) == "2000-01-01T00:00:00.002+00:00"
+@test string(Dates.DateTime(2000,1,1,0,0,0,500)) == "2000-01-01T00:00:00.5+00:00"
+@test string(Dates.DateTime(2000,1,1,0,0,0,998)) == "2000-01-01T00:00:00.998+00:00"
+@test string(Dates.DateTime(2000,1,1,0,0,0,999)) == "2000-01-01T00:00:00.999+00:00"
 
 # DateTime parsing
 # Useful reference for different locales: http://library.princeton.edu/departments/tsd/katmandu/reference/months.html
@@ -222,8 +222,8 @@ Dates.VALUETOMONTHABBR["globex"] = [v=>uppercase(k) for (k,v) in globex]
 @test Dates.format(Dates.Date(2014,1,1),f;locale="globex") == "1F4"
 
 # From Matt Bauman
-f = "yyyy-mm-ddTHH:MM:SSZ"
-@test Dates.DateTime("2014-05-28T16:46:04Z",f) == Dates.DateTime(2014,5,28,16,46,04)
+f = "yyyy-mm-ddTHH:MM:SS+00:00"
+@test Dates.DateTime("2014-05-28T16:46:04+00:00",f) == Dates.DateTime(2014,5,28,16,46,04)
 
 # Try to break stuff
 

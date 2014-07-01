@@ -9,7 +9,7 @@ function Base.string(dt::DateTime)
     mii = lpad(mi,2,"0")
     ss = lpad(s,2,"0")
     ms = millisecond(dt) == 0 ? "" : string(millisecond(dt)/1000.0)[2:end]
-    return "$yy-$mm-$(dd)T$hh:$mii:$ss$(ms)Z"
+    return "$yy-$mm-$(dd)T$hh:$mii:$ss$(ms)+00:00"
 end
 Base.show(io::IO,x::DateTime) = print(io,string(x))
 function Base.string(dt::Date)
