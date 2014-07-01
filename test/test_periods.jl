@@ -111,7 +111,7 @@ y2 = Dates.Year(2)
 @test_throws InexactError Dates.Year(float32(1.2)) == y
 @test_throws InexactError Dates.Year(3//4) == y
 @test_throws InexactError Dates.Year(complex(1.2)) == y
-@test_throws MethodError Dates.Year(float16(1.2)) == y
+@test_throws InexactError Dates.Year(float16(1.2)) == y
 @test Dates.Year(true) == y
 @test Dates.Year(false) != y
 @test Dates.Year('\x01') == y

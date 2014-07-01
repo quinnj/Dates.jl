@@ -78,4 +78,4 @@ end
 
 Base.start(r::StepRange{Date}) = 0
 Base.next(r::StepRange{Date}, i) = (r.start+r.step*i,i+1)
-Base.done{S}(r::StepRange{Date,S}, i) = length(r) <= i #r.start+r.step*i == r.stop || ((r.step>zero(S))&&r.start>r.stop)
+Base.done{S<:Period}(r::StepRange{Date,S}, i::Integer) = length(r) <= i

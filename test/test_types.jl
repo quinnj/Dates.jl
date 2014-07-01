@@ -50,6 +50,7 @@ test = Date(1,1,1)
 @test Date(complex(1),complex(1),complex(1)) == test
 @test Date(float64(1),float64(1),float64(1)) == test
 @test Date(float32(1),float32(1),float32(1)) == test
+@test Date(float16(1),float16(1),float16(1)) == test
 @test Date(Rational(1),Rational(1),Rational(1)) == test
 @test_throws InexactError Date(BigFloat(1.2),BigFloat(1),BigFloat(1))
 @test_throws InexactError Date(1 + im,complex(1),complex(1))
@@ -57,7 +58,6 @@ test = Date(1,1,1)
 @test_throws InexactError Date(1.2f0,1.f0,1.f0)
 @test_throws InexactError Date(3//4,Rational(1),Rational(1)) == test
 # Currently no method for convert(Int64,::Float16)
-@test_throws MethodError Date(float16(1),float16(1),float16(1)) == test
 
 # Months must be in range
 @test_throws ArgumentError Dates.DateTime(2013,0,1)
@@ -78,8 +78,8 @@ b = Dates.Date(2000)
 @test Dates.calendar(b) == Dates.ISOCalendar
 @test Dates.precision(a) == Dates.UTInstant{Dates.Millisecond}
 @test Dates.precision(b) == Dates.UTInstant{Dates.Day}
-@test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59Z"
-@test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00Z"
+@test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59+00:00"
+@test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00+00:00"
 @test typemax(Dates.DateTime) - typemin(Dates.DateTime) == Dates.Millisecond(9223372017043199000)
 @test string(typemax(Dates.Date)) == "252522163911149-12-31"
 @test string(typemin(Dates.Date)) == "-252522163911150-01-01"
