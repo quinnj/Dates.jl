@@ -9,7 +9,7 @@ function Base.string(dt::DateTime)
     mii = lpad(mi,2,"0")
     ss = lpad(s,2,"0")
     ms = millisecond(dt) == 0 ? "" : string(millisecond(dt)/1000.0)[2:end]
-    return "$yy-$mm-$(dd)T$hh:$mii:$ss$(ms)+00:00"
+    return "$yy-$mm-$(dd)T$hh:$mii:$ss$(ms)"
 end
 Base.show(io::IO,x::DateTime) = print(io,string(x))
 function Base.string(dt::Date)
@@ -139,7 +139,7 @@ function format(dt::TimeType,df::DateFormat)
 end
 
 # UI
-const ISODateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS+00:00")
+const ISODateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS")
 const ISODateFormat = DateFormat("yyyy-mm-dd")
 
 DateTime(dt::String,format::String;locale::String="english") = DateTime(dt,DateFormat(format,locale))

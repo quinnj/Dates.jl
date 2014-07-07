@@ -78,8 +78,8 @@ b = Dates.Date(2000)
 @test Dates.calendar(b) == Dates.ISOCalendar
 @test Dates.precision(a) == Dates.UTInstant{Dates.Millisecond}
 @test Dates.precision(b) == Dates.UTInstant{Dates.Day}
-@test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59+00:00"
-@test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00+00:00"
+@test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59"
+@test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00"
 @test typemax(Dates.DateTime) - typemin(Dates.DateTime) == Dates.Millisecond(9223372017043199000)
 @test string(typemax(Dates.Date)) == "252522163911149-12-31"
 @test string(typemin(Dates.Date)) == "-252522163911150-01-01"
