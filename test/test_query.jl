@@ -39,6 +39,22 @@ Dates.VALUETODAYOFWEEK["french"] = french_daysofweek
 @test Dates.dayname(feb;locale="french") == "Samedi"
 @test Dates.dayname(may;locale="french") == "Dimanche"
 
+const french_months = [1=>"janvier",2=>"février",3=>"mars",4=>"avril",5=>"mai",6=>"juin",
+                       7=>"juillet",8=>"août",9=>"septembre",10=>"octobre",11=>"novembre",12=>"décembre"]
+Dates.VALUETOMONTH["french"] = french_months
+@test Dates.monthname(jan;locale="french") == "janvier"
+@test Dates.monthname(feb;locale="french") == "février"
+@test Dates.monthname(mar;locale="french") == "mars"
+@test Dates.monthname(apr;locale="french") == "avril"
+@test Dates.monthname(may;locale="french") == "mai"
+@test Dates.monthname(jun;locale="french") == "juin"
+@test Dates.monthname(jul;locale="french") == "juillet"
+@test Dates.monthname(aug;locale="french") == "août"
+@test Dates.monthname(sep;locale="french") == "septembre"
+@test Dates.monthname(oct;locale="french") == "octobre"
+@test Dates.monthname(nov;locale="french") == "novembre"
+@test Dates.monthname(dec;locale="french") == "décembre"
+
 @test Dates.daysinmonth(2000,1) == 31
 @test Dates.daysinmonth(2000,2) == 29
 @test Dates.daysinmonth(2000,3) == 31
