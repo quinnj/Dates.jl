@@ -6,9 +6,9 @@ Base.trunc(dt::Date,p::Type{Day}) = dt
 Base.trunc(dt::DateTime,p::Type{Year}) = DateTime(trunc(Date(dt),Year))
 Base.trunc(dt::DateTime,p::Type{Month}) = DateTime(trunc(Date(dt),Month))
 Base.trunc(dt::DateTime,p::Type{Day}) = DateTime(Date(dt))
-Base.trunc(dt::DateTime,p::Type{Hour}) = dt - Minute(minute(dt)) - Second(second(dt)) - Millisecond(millisecond(dt))
-Base.trunc(dt::DateTime,p::Type{Minute}) = dt - Second(second(dt)) - Millisecond(millisecond(dt))
-Base.trunc(dt::DateTime,p::Type{Second}) = dt - Millisecond(millisecond(dt))
+Base.trunc(dt::DateTime,p::Type{Hour}) = dt - Minute(dt) - Second(dt) - Millisecond(dt)
+Base.trunc(dt::DateTime,p::Type{Minute}) = dt - Second(dt) - Millisecond(dt)
+Base.trunc(dt::DateTime,p::Type{Second}) = dt - Millisecond(dt)
 Base.trunc(dt::DateTime,p::Type{Millisecond}) = dt
 
 # Adjusters
@@ -163,8 +163,8 @@ function recur{T<:TimeType}(fun::Function,start::T,stop::T;step::Period=Day(1),n
     while true
         next = Dates.adjust(df,start,step,limit)
         next > stop && break
-        start = start == next ? start+step : next+step
         push!(a,next)
+        start = start == next ? start+step : next+step
     end
     return a
 end
