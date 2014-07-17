@@ -137,23 +137,11 @@ function tofirst(dt::TimeType,dow::Int;of::Union(Type{Year},Type{Month})=Month)
     dt = of <: Month ? firstdayofmonth(dt) : firstdayofyear(dt)
     return adjust(ISDAYOFWEEK[dow],dt,Day(1),366)
 end
-function tofirst(func::Function,dt::TimeType;
-                 step::Period=Day(1),negate::Bool=false,limit::Int=10000,of::Union(Type{Year},Type{Month})=Month)
-    dt,limit = of <: Month ? (firstdayofmonth(dt),daysinmonth(dt)) : 
-                             (firstdayofyear(dt),daysinyear(dt))
-    return adjust(DateFunction(func,negate,dt),dt,step,limit)
-end
 
 # Return the last TimeType that falls on dow in the Month or Year
 function tolast(dt::TimeType,dow::Int;of::Union(Type{Year},Type{Month})=Month)
     dt = of <: Month ? lastdayofmonth(dt) : lastdayofyear(dt)
     return adjust(ISDAYOFWEEK[dow],dt,Day(-1),366)
-end
-function tolast(func::Function,dt::TimeType;
-                 step::Period=Day(-1),negate::Bool=false,limit::Int=10000,of::Union(Type{Year},Type{Month})=Month)
-    dt,limit = of <: Month ? (lastdayofmonth(dt),daysinmonth(dt)) : 
-                             (lastdayofyear(dt),daysinyear(dt))
-    return adjust(DateFunction(func,negate,dt),dt,step,limit)
 end
 
 function recur{T<:TimeType}(fun::Function,start::T,stop::T;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
