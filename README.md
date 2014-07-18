@@ -1,7 +1,7 @@
 # Dates
 
 [![Build Status](https://travis-ci.org/quinnj/Dates.jl.png)](https://travis-ci.org/quinnj/Dates.jl)
-
+[![Coverage Status](https://img.shields.io/coveralls/quinnj/Dates.jl.svg)](https://coveralls.io/r/quinnj/Dates.jl)
 
 A Date and DateTime implementation for Julia
 
