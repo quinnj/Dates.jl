@@ -27,7 +27,7 @@
 @test string(Dates.unix2datetime(915148801.25)) == string("1999-01-01T00:00:01.25")
 
 @test Date(Dates.rata2datetime(734869)) == Date(2013,1,1)
-@test Dates.date2rata(Dates.Date(Dates.rata2datetime(734869))) == 734869
+@test Dates.datetime2rata(Dates.rata2datetime(734869)) == 734869
 
 # Tests from here: http://mysite.verizon.net/aesir_research/date/back.htm#JDN
 @test Dates.julian2datetime(1721119.5) == DateTime(0,3,1)
