@@ -66,10 +66,10 @@ function DateFormat(f::String,locale::String="english")
         tran = i >= endof(s) ? r"$" : match(Regex("(?<=$(s[i])).*(?=$(s[i+1]))"),f).match
         slot = tran == "" || tran == r"$" ? Dates.FixedWidthSlot : Dates.DelimitedSlot
         width = length(k)
-        typ = 'y' in k ? Dates.Year : 'm' in k ? Dates.Month : 
+        typ = 'y' in k ? Dates.Year : 'm' in k ? Dates.Month :
               'u' in k ? Dates.Month : 'U' in k ? Dates.Month :
-              'd' in k ? Dates.Day : 'H' in k ? Dates.Hour : 
-              'M' in k ? Dates.Minute : 'S' in k ? Dates.Second : Dates.Millisecond 
+              'd' in k ? Dates.Day : 'H' in k ? Dates.Hour :
+              'M' in k ? Dates.Minute : 'S' in k ? Dates.Second : Dates.Millisecond
         option = 'U' in k ? 2 : 'u' in k ? 1 : 0
         push!(slots,slot(i,typ,width,option,locale))
         push!(trans,tran)
@@ -157,7 +157,7 @@ function DateTime{T<:String}(y::AbstractArray{T},df::DateFormat=ISODateFormat)
 end
 Date{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = Date(y,DateFormat(format,locale))
 function Date{T<:String}(y::AbstractArray{T},x::DateFormat=ISODateFormat)
-    return reshape([Date(parse(y[i],f)...) for i in 1:length(y)], size(y))
+    return reshape([Date(parse(y[i],x)...) for i in 1:length(y)], size(y))
 end
 
 format{T<:TimeType}(y::AbstractArray{T},format::String;locale::String="english") = format(y,DateFormat(format,locale))
