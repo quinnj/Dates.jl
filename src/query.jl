@@ -44,7 +44,7 @@ issaturday(dt::TimeType) = dayofweek(dt) == Sat
 issunday(dt::TimeType) = dayofweek(dt) == Sun
 
 # i.e. 1st Monday? 2nd Monday? 3rd Wednesday? 5th Sunday?
-dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 : 
+dayofweekofmonth(dt::TimeType) = (d = day(dt); return d < 8 ? 1 :
     d < 15 ? 2 : d < 22 ? 3 : d < 29 ? 4 : 5)
 
 # Total number of a day of week in the month
@@ -79,7 +79,9 @@ const englishabbr_months = [1=>"Jan",2=>"Feb",3=>"Mar",4=>"Apr",
                             10=>"Oct",11=>"Nov",12=>"Dec"]
 const VALUETOMONTHABBR = (UTF8String=>Dict{Int,UTF8String})["english"=>englishabbr_months]
 monthname(dt::TimeType;locale::String="english") = VALUETOMONTH[locale][month(dt)]
+monthname(m::Int) = VALUETOMONTH[locale][m]
 monthabbr(dt::TimeType;locale::String="english") = VALUETOMONTHABBR[locale][month(dt)]
+monthabbr(m::Int) = VALUETOMONTHABBR[locale][m]
 
 daysinmonth(dt::TimeType) = ((y,m) = yearmonth(dt); return daysinmonth(y,m))
 
