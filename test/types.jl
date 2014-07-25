@@ -57,7 +57,6 @@ test = Date(1,1,1)
 @test_throws InexactError Date(1.2,1.0,1.0)
 @test_throws InexactError Date(1.2f0,1.f0,1.f0)
 @test_throws InexactError Date(3//4,Rational(1),Rational(1)) == test
-# Currently no method for convert(Int64,::Float16)
 
 # Months must be in range
 @test_throws ArgumentError Dates.DateTime(2013,0,1)
@@ -76,8 +75,8 @@ a = Dates.DateTime(2000)
 b = Dates.Date(2000)
 @test Dates.calendar(a) == Dates.ISOCalendar
 @test Dates.calendar(b) == Dates.ISOCalendar
-@test Dates.precision(a) == Dates.UTInstant{Dates.Millisecond}
-@test Dates.precision(b) == Dates.UTInstant{Dates.Day}
+@test Dates.precision(a) == Dates.Millisecond
+@test Dates.precision(b) == Dates.Day
 @test string(typemax(Dates.DateTime)) == "146138512-12-31T23:59:59"
 @test string(typemin(Dates.DateTime)) == "-146138511-01-01T00:00:00"
 @test typemax(Dates.DateTime) - typemin(Dates.DateTime) == Dates.Millisecond(9223372017043199000)
