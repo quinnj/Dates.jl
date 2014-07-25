@@ -73,6 +73,6 @@ function in{T<:TimeType,S<:Period}(x, r::StepRange{T,S})
     return false
 end
 
-Base.start(r::StepRange{Date}) = 0
-Base.next(r::StepRange{Date}, i) = (r.start+r.step*i,i+1)
-Base.done{S<:Period}(r::StepRange{Date,S}, i::Integer) = length(r) <= i
+Base.start{T<:TimeType}(r::StepRange{T}) = 0
+Base.next{T<:TimeType}(r::StepRange{T}, i) = (r.start+r.step*i,i+1)
+Base.done{T<:TimeType,S<:Period}(r::StepRange{T,S}, i::Integer) = length(r) <= i
