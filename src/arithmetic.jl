@@ -69,7 +69,7 @@ end
 (+)(y::Period,x::TimeType) = x + y
 (-)(y::Period,x::TimeType) = x - y
 
-(.+){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape([i + y for i in x], size(x))
-(.-){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape([i - y for i in x], size(x))
+(.+){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape(T[i + y for i in x], size(x))
+(.-){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape(T[i - y for i in x], size(x))
 (.+){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .+ y
 (.-){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .- y

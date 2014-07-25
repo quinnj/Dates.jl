@@ -264,3 +264,5 @@ dr2 = [Dates.Date(2000):Dates.Date(2000,1,10)]
 
 @test Dates.format(dr2) == dr
 @test Dates.format(dr2,"yyyy-mm-dd") == dr
+
+@test typeof(Dates.Date(dr)) == Array{Date,1}

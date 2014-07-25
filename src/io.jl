@@ -153,11 +153,11 @@ format(dt::TimeType,f::String;locale::String="english") = format(dt,DateFormat(f
 # vectorized
 DateTime{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = DateTime(y,DateFormat(format,locale))
 function DateTime{T<:String}(y::AbstractArray{T},df::DateFormat=ISODateFormat)
-    return reshape([DateTime(parse(y[i],df)...) for i in 1:length(y)], size(y))
+    return reshape(DateTime[DateTime(parse(y[i],df)...) for i in 1:length(y)], size(y))
 end
 Date{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = Date(y,DateFormat(format,locale))
 function Date{T<:String}(y::AbstractArray{T},df::DateFormat=ISODateFormat)
-    return reshape([Date(parse(y[i],df)...) for i in 1:length(y)], size(y))
+    return reshape(Date[Date(parse(y[i],df)...) for i in 1:length(y)], size(y))
 end
 
 format{T<:TimeType}(y::AbstractArray{T},format::String;locale::String="english") = Dates.format(y,DateFormat(format,locale))
