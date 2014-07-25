@@ -16,4 +16,4 @@ julia> using Dates # Loads Dates code into current julia session
 ```
 
 
-* Checkout the work-in-progress [Dates manual](https://github.com/quinnj/Dates.jl/blob/master/docs/docs.md)
+* Checkout the work-in-progress [Dates manual](https://github.com/quinnj/Dates.jl/blob/master/docs/docs.rst)
