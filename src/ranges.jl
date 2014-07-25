@@ -62,8 +62,8 @@ function Base.steprem(start::TimeType,stop::TimeType,step::Period)
     return stop - (start+step*(i-1))
 end
 
-# Specialize for Date-Day, DateTime-Millisecond?
 import Base.in
+# TODO: Specialize for Date-Day, DateTime-Millisecond?
 # TODO: use binary search
 function in{T<:TimeType,S<:Period}(x, r::StepRange{T,S})
     isempty(r) && return false

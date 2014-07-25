@@ -146,7 +146,7 @@ end
 
 function recur{T<:TimeType}(fun::Function,start::T,stop::T;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
     a = T[]
-    #sizehint(a,)
+    #sizehint(a,)?
     df = DateFunction(fun,negate,start)
     while true
         next = Dates.adjust(df,start,step,limit)

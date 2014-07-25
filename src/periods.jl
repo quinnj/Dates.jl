@@ -110,7 +110,6 @@ Base.show(io::IO,x::CompoundPeriod) = print(io,string(x))
 (-)(x::CompoundPeriod,y::Period) = (sort!(push!(x.periods,-y),rev=true,lt=periodisless); return x)
 
 # Capture TimeType+-Period methods
-typealias TTP Union(TimeType,Period)
 (+)(a::TimeType,b::Period,c::Period) = (+)(a,b+c)
 (-)(a::TimeType,b::Period,c::Period) = (-)(a,b-c)
 (+)(a::TimeType,b::Period,c::Period,d::Period...) = (+)((+)(a,b+c),d...)
