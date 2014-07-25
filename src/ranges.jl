@@ -35,23 +35,20 @@ function Base.length{T<:Period}(r::StepRange{T})
     end
 end
 
-# Given a start and stop date, calculate the difference between
-# the given stop date and the last valid date given the Period step
-# last = stop - steprem(start,stop,step)
+# Helper function that has been manually tuned to prevent ranges
+# so large that calculating steprem or length on them would make
+# the REPL appear to hang. The values were chosen where the calculations
+# can still be done in just a few seconds on a decent single-core machine
 toobig(start::Date,stop::Date,step::Year) = (stop-start) > Day(3652425000*value(step))
 toobig(start::Date,stop::Date,step::Month) = (stop-start) > Day(365242500*value(step))
 toobig(start::DateTime,stop::DateTime,step::Year) = (stop-start) > Day(3652425000*value(step))
 toobig(start::DateTime,stop::DateTime,step::Month) = (stop-start) > Day(365242500*value(step))
 
+# Given a start and stop date, calculate the difference between
+# the given stop date and the last valid date given the Period step
+# last = stop - steprem(start,stop,step)
 Base.steprem(a::Date,b::Date,c::Day) = (b-a) % c
 Base.steprem(a::Date,b::Date,c::Week) = (b-a) % (7*value(c))
-
-toms(c::Week)        = 604800000*value(c)
-toms(c::Day)         = 86400000*value(c)
-toms(c::Hour)        = 3600000*value(c)
-toms(c::Minute)      = 60000*value(c)
-toms(c::Second)      = 1000*value(c)
-toms(c::Millisecond) = value(c)
 
 Base.steprem(a::DateTime,b::DateTime,c::Union(Week,Day,TimePeriod)) = (b-a) % toms(c)
 function Base.steprem(start::TimeType,stop::TimeType,step::Period)

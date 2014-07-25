@@ -133,3 +133,11 @@ Hour(x::TimeType) = Hour(hour(x))
 Minute(x::TimeType) = Minute(minute(x))
 Second(x::TimeType) = Second(second(x))
 Millisecond(x::TimeType) = Millisecond(millisecond(x))
+
+# Convert fixed value Periods to # of milliseconds
+toms(c::Week)        = 604800000*value(c)
+toms(c::Day)         = 86400000*value(c)
+toms(c::Hour)        = 3600000*value(c)
+toms(c::Minute)      = 60000*value(c)
+toms(c::Second)      = 1000*value(c)
+toms(c::Millisecond) = value(c)
