@@ -402,3 +402,15 @@ observed = Dates.recur(OBSERVEDHOLIDAYS,Dates.Date(1999):Dates.Date(2000))
 @test length(observed) == 11
 @test observed[10] == Dates.Date(1999,12,24)
 @test observed[11] == Dates.Date(1999,12,31)
+
+# Get all business/working days of 2014
+# Since we have already defined observed holidays,
+# we just look at weekend days and use the "negate" keyword of recur
+@test length(Dates.recur(Dates.Date(2014):Dates.Date(2015);negate=true) do x
+    OBSERVEDHOLIDAYS(x) || 
+    Dates.dayofweek(x) > 5
+end) == 251
+
+# First day of the next month for each day of 2014
+@test length([Dates.firstdayofmonth(i+Dates.Month(1)) 
+    for i in Dates.Date(2014):Dates.Date(2014,12,31)]) == 365

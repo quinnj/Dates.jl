@@ -6,7 +6,7 @@ dr = a:b
 @test length(dr) == 32
 @test findin(dr,dr) == [1:32]
 @test findin(a:Dates.Date(2013,1,14),dr) == [1:14]
-@test findin(a:Dates.Date(2012,12,31),dr) == Int64[]
+@test findin(a:Dates.Date(2012,12,31),dr) == Int[]
 @test isempty(a:Dates.Date(2012,12,31))
 @test reverse(dr) == b:Dates.Day(-1):a
 @test map!(x->x+Dates.Day(1),Array(Date,32),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]

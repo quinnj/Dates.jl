@@ -239,8 +239,8 @@ f = "y m d"
 @test Dates.Date("1 1 1",f) == Dates.Date(1)
 @test Dates.Date("10000000000 1 1",f) == Dates.Date(10000000000)
 @test_throws ArgumentError Dates.Date("1 13 1",f)
-@test Dates.Date("1 1 32",f) == Dates.Date(1,2,1)
-@test Dates.Date(" 1 1 32",f) == Dates.Date(1,2,1)
+@test_throws ArgumentError Dates.Date("1 1 32",f)
+@test_throws ArgumentError Dates.Date(" 1 1 32",f)
 @test_throws ArgumentError Dates.Date("# 1 1 32",f)
 # can't find 1st space delimiter,s o fails
 @test_throws ArgumentError Dates.Date("1",f)

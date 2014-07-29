@@ -55,30 +55,6 @@ Dates.VALUETOMONTH["french"] = french_months
 @test Dates.monthname(nov;locale="french") == "novembre"
 @test Dates.monthname(dec;locale="french") == "décembre"
 
-@test Dates.daysinmonth(2000,1) == 31
-@test Dates.daysinmonth(2000,2) == 29
-@test Dates.daysinmonth(2000,3) == 31
-@test Dates.daysinmonth(2000,4) == 30
-@test Dates.daysinmonth(2000,5) == 31
-@test Dates.daysinmonth(2000,6) == 30
-@test Dates.daysinmonth(2000,7) == 31
-@test Dates.daysinmonth(2000,8) == 31
-@test Dates.daysinmonth(2000,9) == 30
-@test Dates.daysinmonth(2000,10) == 31
-@test Dates.daysinmonth(2000,11) == 30
-@test Dates.daysinmonth(2000,12) == 31
-@test Dates.daysinmonth(2001,2) == 28
-
-@test Dates.isleap(1900) == false
-@test Dates.isleap(2000) == true
-@test Dates.isleap(2004) == true
-@test Dates.isleap(2008) == true
-@test Dates.isleap(0) == true
-@test Dates.isleap(1) == false
-@test Dates.isleap(-1) == false
-@test Dates.isleap(4) == true
-@test Dates.isleap(-4) == true
-
 @test Dates.isleap(Dates.DateTime(1900)) == false
 @test Dates.isleap(Dates.DateTime(2000)) == true
 @test Dates.isleap(Dates.DateTime(2004)) == true
