@@ -76,16 +76,29 @@ function totaldays(y,m,d)
     return d + mdays + 365z + fld(z,4) - fld(z,100) + fld(z,400) - 306
 end
 
+# If the year is divisible by 4, except for every 100 years, except for every 400 years
+isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
+
+# Number of days in month
+const DAYSINMONTH = [31,28,31,30,31,30,31,31,30,31,30,31]
+daysinmonth(y,m) = DAYSINMONTH[m] + (m == 2 && isleap(y))
+
 ### CONSTRUCTORS ###
 # Core constructors
 function DateTime(y::Int64,m::Int64=1,d::Int64=1,
                   h::Int64=0,mi::Int64=0,s::Int64=0,ms::Int64=0)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
+    0 < d < daysinmonth(y,m)+1 || throw(ArgumentError("Day: $d out of range (1:$daysinmonth(y,m))"))
+    -1 < h < 24 || throw(ArgumentError("Hour: $h out of range (1:23)"))
+    -1 < mi < 60 || throw(ArgumentError("Minute: $mi out of range (1:59)"))
+    -1 < s < 60 || throw(ArgumentError("Second: $s out of range (1:59)"))
+    -1 < ms < 1000 || throw(ArgumentError("Millisecond: $ms out of range (1:999)"))
     rata = ms + 1000*(s + 60mi + 3600h + 86400*totaldays(y,m,d))
     return DateTime(UTM(rata))
 end
 function Date(y::Int64,m::Int64=1,d::Int64=1)
     0 < m < 13 || throw(ArgumentError("Month: $m out of range (1:12)"))
+    0 < d < daysinmonth(y,m)+1 || throw(ArgumentError("Day: $d out of range (1:$daysinmonth(y,m))"))
     return Date(UTD(totaldays(y,m,d)))
 end
 
@@ -146,5 +159,6 @@ Base.isless(x::DateTime,y::DateTime) = isless(value(x),value(y))
 Base.isless(x::TimeType,y::TimeType) = isless(promote(x,y)...)
 ==(x::TimeType,y::TimeType) = ===(promote(x,y)...)
 
-export Period, Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
+export Period, DatePeriod, TimePeriod,
+       Year, Month, Week, Day, Hour, Minute, Second, Millisecond,
        TimeType, DateTime, Date

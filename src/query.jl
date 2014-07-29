@@ -5,13 +5,6 @@
 # Monday = 1....Sunday = 7
 dayofweek(days) = mod1(days,7)
 
-# If the year is divisible by 4, except for every 100 years, except for every 400 years
-isleap(y) = ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
-
-# Number of days in month
-const DAYSINMONTH = [31,28,31,30,31,30,31,31,30,31,30,31]
-daysinmonth(y,m) = DAYSINMONTH[m] + (m == 2 && isleap(y))
-
 # Number of days in year
 daysinyear(y) = 365 + isleap(y)
 
