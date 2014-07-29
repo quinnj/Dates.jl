@@ -15,12 +15,13 @@ for p in (:Year,:Month,:Week,:Day,:Hour,:Minute,:Second,:Millisecond)
     @eval periodisless(x::$p,y::$p) = value(x) < value(y)
     # String parsing (mainly for IO code)
     @eval $p(x::String) = $p(parseint(x))
+    # Period accessors
+    @eval $p(x::TimeType) = $p($(symbol(lowercase(string(p))))(x))
 end
 # Now we're safe to define Period-Number conversions
 # Anything an Int64 can convert to, a Period can convert to
 Base.convert{T<:Number}(::Type{T},x::Period) = convert(T,value(x))
-# Error quickly if x can't convert losslessly to Int64
-Base.convert{P<:Period}(::Type{P},x::Number) = P(convert(Int64,x))
+Base.convert{T<:Period}(::Type{T},x::Real) = T(int64(x))
 
 #Print/show/traits
 Base.string{P<:Period}(x::P) = string(value(x),_units(x))
@@ -122,16 +123,6 @@ function (+)(x::TimeType,y::CompoundPeriod)
     return x
 end
 (+)(x::CompoundPeriod,y::TimeType) = y + x
-
-# Periods from TimeTypes
-Year(x::TimeType) = Year(year(x))
-Month(x::TimeType) = Month(month(x))
-Week(x::TimeType) = Week(week(x))
-Day(x::TimeType) = Day(day(x))
-Hour(x::TimeType) = Hour(hour(x))
-Minute(x::TimeType) = Minute(minute(x))
-Second(x::TimeType) = Second(second(x))
-Millisecond(x::TimeType) = Millisecond(millisecond(x))
 
 # Convert fixed value Periods to # of milliseconds
 toms(c::Week)        = 604800000*value(c)
