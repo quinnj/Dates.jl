@@ -1,6 +1,9 @@
 using Dates
 using Base.Test
 
+cd("C:/Users/karbarcca/.julia/v0.3/Dates/test")
+
+include("C:/Users/karbarcca/.julia/v0.3/Dates/src/Dates.jl"); using Dates
 include("types.jl")
 include("periods.jl")
 include("accessors.jl")
@@ -13,7 +16,6 @@ include("io.jl")
 
 
 #TODO
- #docs update
  #Timezones.jl
 
 #NEED TESTS

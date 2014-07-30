@@ -298,3 +298,19 @@ dt = Dates.DateTime(2014)
 @test Dates.default(Dates.Minute) == zero(Dates.Minute)
 @test Dates.default(Dates.Second) == zero(Dates.Second)
 @test Dates.default(Dates.Millisecond) == zero(Dates.Millisecond)
+
+# Conversions
+@test Dates.toms(ms) == 1
+@test Dates.toms(s) == 1000
+@test Dates.toms(mi) == 60000
+@test Dates.toms(h) == 3600000
+@test Dates.toms(d) == 86400000
+@test Dates.toms(w) == 604800000
+
+@test Dates.days(ms) == Dates.days(s) == Dates.days(mi) == Dates.days(h) == 0
+@test Dates.days(Dates.Millisecond(86400000)) == 1
+@test Dates.days(Dates.Second(86400)) == 1
+@test Dates.days(Dates.Minute(1440)) == 1
+@test Dates.days(Dates.Hour(24)) == 1
+@test Dates.days(d) == 1
+@test Dates.days(w) == 7

@@ -317,3 +317,14 @@ a = Dates.Date(2012,10,30)
 @test (a+Dates.Day(1))+Dates.Month(1) != (a+Dates.Month(1))+Dates.Day(1)
 a = Dates.Date(2012,11,30)
 @test (a+Dates.Day(1))+Dates.Month(1) != (a+Dates.Month(1))+Dates.Day(1)
+
+
+dt = Dates.DateTime(2000,1,1,12,30,45,500)
+dt2 = dt + Dates.Year(1)
+@test Dates.year(dt2) == 2001
+@test Dates.month(dt2) == 1
+@test Dates.day(dt2) == 1
+@test Dates.hour(dt2) == 12
+@test Dates.minute(dt2) == 30
+@test Dates.second(dt2) == 45
+@test Dates.millisecond(dt2) == 500
