@@ -1,54 +1,44 @@
 # Date/DateTime Ranges
-# Given a start and end date, how many steps/periods are in between
-function Base.length(r::StepRange{Date,Day})
-    isempty(r) ? 0 : int(div(r.stop+r.step - r.start, r.step))
-end
-function Base.length(r::StepRange{Date,Week})
-    isempty(r) ? 0 : int(div(r.stop+r.step - r.start, 7*value(r.step)))
-end
-function Base.length{T<:Union(Week,Day,TimePeriod)}(r::StepRange{DateTime,T})
-    isempty(r) ? 0 : int(div(r.stop+r.step - r.start, toms(r.step)))
-end
 
-function Base.length{T<:TimeType,P<:Period}(r::StepRange{T,P})
-    isempty(r) && return 0
-    start,stop = r.start > r.stop ? (r.stop,r.start) : (r.start,r.stop)
-    step = r.step < zero(r.step) ? -r.step : r.step
-    i = 0
+typealias Dayable Union(Week,Day,Hour,Minute,Second,Millisecond)
+
+# Override default step; otherwise it would be Millisecond(1)
+Base.colon{T<:DateTime}(start::T, stop::T) = StepRange(start, Day(1), stop)
+
+# Given a start and end date, how many steps/periods are in between
+Base.length(r::StepRange{Date,Day}) = isempty(r) ? 0 : 
+    int(div(r.stop + r.step - r.start, r.step))
+Base.length(r::StepRange{Date,Week}) = isempty(r) ? 0 : 
+    int(div(r.stop + r.step - r.start, 7*value(r.step)))
+Base.length{T<:Dayable}(r::StepRange{DateTime,T}) = isempty(r) ? 0 : 
+    int(div(r.stop + r.step - r.start, toms(r.step)))
+
+# Calculate a conservative guess for how many months/years are between two dates
+guess(start::Date,stop::Date,step::Month) = int(float(stop-start)/(30.436875*value(step)))
+guess(start::Date,stop::Date,step::Year) = int(float(stop-start)/(365.2425*value(step)))
+guess(start::DateTime,stop::DateTime,step::Month) = int(float(days(stop-start))/(30.436875*value(step)))
+guess(start::DateTime,stop::DateTime,step::Year) = int(float(days(stop-start))/(365.2425*value(step)))
+
+function _length(start,stop,step)
+    start,stop = start > stop ? (stop,start) : (start,stop)
+    step = step < zero(step) ? -step : step
+    i = guess(start,stop,step)
     while (start+step*i) <= stop
         i += 1
     end
     return i
 end
-# Period ranges hooks into Int64 overflow detection
-Base.length{T<:Period}(r::StepRange{T}) = length(StepRange(value(start(r)),value(step(r)),value(last(r))))
 
-# Helper function that has been manually tuned to prevent ranges
-# so large that calculating steprem or length on them would make
-# the REPL appear to hang. The values were chosen where the calculations
-# can still be done in just a few seconds on a decent single-core machine
-toobig(start::Date,stop::Date,step::Year) = (stop-start) > Day(3652425000*value(step))
-toobig(start::Date,stop::Date,step::Month) = (stop-start) > Day(365242500*value(step))
-toobig(start::DateTime,stop::DateTime,step::Year) = (stop-start) > Millisecond(3652425000*value(step))
-toobig(start::DateTime,stop::DateTime,step::Month) = (stop-start) > Millisecond(365242500*value(step))
+Base.length{T<:TimeType}(r::StepRange{T}) = isempty(r) ? 0 : _length(r.start,r.stop,r.step)
+# Period ranges hook into Int64 overflow detection
+Base.length{T<:Period}(r::StepRange{T}) = length(StepRange(value(r.start),value(r.step),value(r.stop)))
 
-# Given a start and stop date, calculate the difference between
-# the given stop date and the last valid date given the Period step
+# Used to calculate the last valid date in the range given the start, stop, and step
 # last = stop - steprem(start,stop,step)
 Base.steprem(a::Date,b::Date,c::Day) = (b-a) % c
 Base.steprem(a::Date,b::Date,c::Week) = (b-a) % (7*value(c))
-
-Base.steprem(a::DateTime,b::DateTime,c::Union(Week,Day,TimePeriod)) = (b-a) % toms(c)
-function Base.steprem(start::TimeType,stop::TimeType,step::Period)
-    start,stop = start > stop ? (stop,start) : (start,stop)
-    step = step < zero(step) ? -step : step
-    toobig(start,stop,step) && throw(ArgumentError("Desired range is too big"))
-    i = 1
-    while (start+step*i) <= stop
-        i += 1
-    end
-    return stop - (start+step*(i-1))
-end
+Base.steprem(a::DateTime,b::DateTime,c::Dayable) = (b-a) % toms(c)
+Base.steprem{T<:TimeType}(a::T,b::T,step::Period) = b - (a+step*(_length(a,b,step)-1))
 
 import Base.in
 function in{T<:TimeType,S<:Period}(x::T, r::StepRange{T,S})
