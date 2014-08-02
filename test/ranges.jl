@@ -143,7 +143,7 @@ function testlengths(n)
     end
     return a+Dates.Day(n)
 end
-@time testlengths(100000)
+testlengths(100000)
 
 # Custom definition to override default step of DateTime ranges
 @test typeof(step(Dates.DateTime(2000):Dates.DateTime(2001))) == Dates.Day

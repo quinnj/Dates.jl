@@ -52,6 +52,7 @@ end
 
 immutable DateFormat
     slots::Array{Slot,1}
+    begtran # optional transition from the start of a string to the 1st slot
     trans #trans[i] == how to transition FROM slots[i] TO slots[i+1]
 end
 
@@ -60,7 +61,9 @@ duplicates(slots) = any(map(x->count(y->x.period==y.period,slots),slots) .> 1)
 function DateFormat(f::String,locale::String="english")
     slots = Slot[]
     trans = {}
-    s = split(f,r"[^ymuUdHMSs]|(?<=([ymuUdHMSs])(?!\1))")
+    begtran = match(r"^.*?(?=[ymuUdHMSs])",f).match
+    ss = split(f,r"^.*?(?=[ymuUdHMSs])")
+    s = split(begtran == "" ? ss[1] : ss[2],r"[^ymuUdHMSs]|(?<=([ymuUdHMSs])(?!\1))")
     for (i,k) in enumerate(s)
         k == "" && break
         tran = i >= endof(s) ? r"$" : match(Regex("(?<=$(s[i])).*(?=$(s[i+1]))"),f).match
@@ -75,7 +78,7 @@ function DateFormat(f::String,locale::String="english")
         push!(trans,tran)
     end
     duplicates(slots) && throw(ArgumentError("Two separate periods of the same type detected"))
-    return DateFormat(slots,trans)
+    return DateFormat(slots,begtran,trans)
 end
 
 const SLOTERROR = ArgumentError("Non-digit character encountered")
@@ -104,6 +107,7 @@ getslot(x,slot,df,cursor) = (cursor+slot.width, slotparse(slot,x[cursor:(cursor+
 
 function parse(x::String,df::DateFormat)
     x = strip(replace(x, r"#.*$", ""))
+    x = replace(x,df.begtran,"")
     isempty(x) && throw(ArgumentError("Cannot parse empty string"))
     (typeof(df.slots[1]) <: DelimitedSlot && first(search(x,df.trans[1])) == 0) && throw(ArgumentError("Delimiter mismsatch. Couldn't find first delimter, \"$(df.trans[1])\", in date string"))
     periods = Period[]

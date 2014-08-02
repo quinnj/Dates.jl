@@ -266,3 +266,12 @@ dr2 = [Dates.Date(2000):Dates.Date(2000,1,10)]
 @test Dates.format(dr2,"yyyy-mm-dd") == dr
 
 @test typeof(Dates.Date(dr)) == Array{Date,1}
+
+# Issue 13
+t = Dates.DateTime(1,1,1,14,51,0,118)
+@test Dates.DateTime("[14:51:00.118]","[HH:MM:SS.sss]") == t
+@test Dates.DateTime("14:51:00.118", "HH:MM:SS.sss") == t
+@test Dates.DateTime("[14:51:00.118?", "[HH:MM:SS.sss?") == t
+@test Dates.DateTime("?14:51:00.118?", "?HH:MM:SS.sss?") == t
+@test Dates.DateTime("x14:51:00.118", "xHH:MM:SS.sss") == t
+@test Dates.DateTime("14:51:00.118]", "HH:MM:SS.sss]") == t
