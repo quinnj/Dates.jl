@@ -300,12 +300,12 @@ dt = Dates.DateTime(2014)
 @test Dates.default(Dates.Millisecond) == zero(Dates.Millisecond)
 
 # Conversions
-@test Dates.toms(ms) == 1
-@test Dates.toms(s) == 1000
-@test Dates.toms(mi) == 60000
-@test Dates.toms(h) == 3600000
-@test Dates.toms(d) == 86400000
-@test Dates.toms(w) == 604800000
+@test Dates.toms(ms) == Dates.value(Dates.Millisecond(ms)) == 1
+@test Dates.toms(s)  == Dates.value(Dates.Millisecond(s)) == 1000
+@test Dates.toms(mi) == Dates.value(Dates.Millisecond(mi)) == 60000
+@test Dates.toms(h)  == Dates.value(Dates.Millisecond(h)) == 3600000
+@test Dates.toms(d)  == Dates.value(Dates.Millisecond(d)) == 86400000
+@test Dates.toms(w)  == Dates.value(Dates.Millisecond(w)) == 604800000
 
 @test Dates.days(ms) == Dates.days(s) == Dates.days(mi) == Dates.days(h) == 0
 @test Dates.days(Dates.Millisecond(86400000)) == 1

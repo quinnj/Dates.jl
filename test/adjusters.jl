@@ -325,7 +325,7 @@ end == Dates.Date(2013,11,28)
 # Pittsburgh street cleaning
 dr = Dates.Date(2014):Dates.Date(2015)
 @test length(recur(dr) do x
-    Dates.dayofweek(x) == Tue && 
+    Dates.dayofweek(x) == Dates.Tue && 
     Dates.April < Dates.month(x) < Dates.Nov &&
     Dates.dayofweekofmonth(x) == 2
 end) == 6

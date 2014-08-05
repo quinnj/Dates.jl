@@ -1,3 +1,4 @@
+using Dates
 using Benchmark
 
 const _dt = Date(2014,1,1)
@@ -23,8 +24,8 @@ perfs = {( p1() = Dates.Date(2014,1,1),"Construction", "Dates.Date(2014,1,1)",10
 ( p11() = Dates.DateTime(_dt),"Conversion", "Dates.DateTime(_dt)",1000000),
 ( p12() = string(_dt), "string","string(_dt)",1000000),
 ( p13() = string(_dt2), "string","string(_dt2)",1000000),
-( p14() = Dates.isleap(_dt),"date functions", "Dates.isleap(_dt)",1000000),
-( p15() = Dates.isleap(_dt2),"date functions", "Dates.isleap(_dt2)",1000000),
+( p14() = Dates.isleapyear(_dt),"date functions", "Dates.isleapyear(_dt)",1000000),
+( p15() = Dates.isleapyear(_dt2),"date functions", "Dates.isleapyear(_dt2)",1000000),
 ( p16() = Dates.firstdayofmonth(_dt),"date functions", "Dates.firstdayofmonth(_dt)",1000000),
 ( p17() = Dates.firstdayofmonth(_dt2),"date functions", "Dates.firstdayofmonth(_dt2)",1000000),
 ( p18() = Dates.lastdayofmonth(_dt),"date functions", "Dates.lastdayofmonth(_dt)",1000000),
@@ -72,8 +73,8 @@ results = benchmarks(perfs)
 | 11    | "Conversion"     | "Dates.DateTime(_dt)"              | 0.0792681 |
 | 12    | "string"         | "string(_dt)"                      | 1.86823   |
 | 13    | "string"         | "string(_dt2)"                     | 3.88872   |
-| 14    | "date functions" | "Dates.isleap(_dt)"                | 0.185513  |
-| 15    | "date functions" | "Dates.isleap(_dt2)"               | 0.207353  |
+| 14    | "date functions" | "Dates.isleapyear(_dt)"                | 0.185513  |
+| 15    | "date functions" | "Dates.isleapyear(_dt2)"               | 0.207353  |
 | 16    | "date functions" | "Dates.firstdayofmonth(_dt)"       | 0.303621  |
 | 17    | "date functions" | "Dates.firstdayofmonth(_dt2)"      | 0.429718  |
 | 18    | "date functions" | "Dates.lastdayofmonth(_dt)"        | 0.354412  |
@@ -119,8 +120,8 @@ results = benchmarks(perfs)
 | 11    | "Conversion"     | "Dates.DateTime(_dt)"              | 0.0781383 |
 | 12    | "string"         | "string(_dt)"                      | 1.81929   |
 | 13    | "string"         | "string(_dt2)"                     | 3.87923   |
-| 14    | "date functions" | "Dates.isleap(_dt)"                | 0.105963  |
-| 15    | "date functions" | "Dates.isleap(_dt2)"               | 0.0670621 |
+| 14    | "date functions" | "Dates.isleapyear(_dt)"                | 0.105963  |
+| 15    | "date functions" | "Dates.isleapyear(_dt2)"               | 0.0670621 |
 | 16    | "date functions" | "Dates.firstdayofmonth(_dt)"       | 0.0753262 |
 | 17    | "date functions" | "Dates.firstdayofmonth(_dt2)"      | 0.122178  |
 | 18    | "date functions" | "Dates.lastdayofmonth(_dt)"        | 0.129431  |

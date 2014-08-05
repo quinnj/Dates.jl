@@ -22,15 +22,15 @@
 @test Dates.daysinmonth(2000,12) == 31
 @test Dates.daysinmonth(2001,2) == 28
 
-@test Dates.isleap(1900) == false
-@test Dates.isleap(2000) == true
-@test Dates.isleap(2004) == true
-@test Dates.isleap(2008) == true
-@test Dates.isleap(0) == true
-@test Dates.isleap(1) == false
-@test Dates.isleap(-1) == false
-@test Dates.isleap(4) == true
-@test Dates.isleap(-4) == true
+@test Dates.isleapyear(1900) == false
+@test Dates.isleapyear(2000) == true
+@test Dates.isleapyear(2004) == true
+@test Dates.isleapyear(2008) == true
+@test Dates.isleapyear(0) == true
+@test Dates.isleapyear(1) == false
+@test Dates.isleapyear(-1) == false
+@test Dates.isleapyear(4) == true
+@test Dates.isleapyear(-4) == true
 
 # Create "test" check manually
 test = Dates.DateTime(Dates.UTM(63492681600000))
