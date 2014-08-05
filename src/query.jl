@@ -6,11 +6,11 @@
 dayofweek(days) = mod1(days,7)
 
 # Number of days in year
-daysinyear(y) = 365 + isleap(y)
+daysinyear(y) = 365 + isleapyear(y)
 
 # Day of the year
 const MONTHDAYS = [0,31,59,90,120,151,181,212,243,273,304,334]
-dayofyear(y,m,d) = MONTHDAYS[m] + d + (m > 2 && isleap(y))
+dayofyear(y,m,d) = MONTHDAYS[m] + d + (m > 2 && isleapyear(y))
 
 ### Days of the Week
 dayofweek(dt::TimeType) = dayofweek(days(dt))
@@ -84,13 +84,13 @@ daysinmonth(dt::TimeType) = ((y,m) = yearmonth(dt); return daysinmonth(y,m))
 @vectorize_1arg TimeType daysinmonth
 
 ### Years
-isleap(dt::TimeType) = isleap(year(dt))
+isleapyear(dt::TimeType) = isleapyear(year(dt))
 
 dayofyear(dt::TimeType) = ((y,m,d) = yearmonthday(dt); return dayofyear(y,m,d))
 
-daysinyear(dt::TimeType) = 365 + isleap(dt)
+daysinyear(dt::TimeType) = 365 + isleapyear(dt)
 
-@vectorize_1arg TimeType isleap
+@vectorize_1arg TimeType isleapyear
 @vectorize_1arg TimeType dayofyear
 @vectorize_1arg TimeType daysinyear
 
@@ -105,7 +105,7 @@ dayofquarter(dt::TimeType) = dayofyear(dt) - QUARTERDAYS[quarterofyear(dt)]
 @vectorize_1arg TimeType quarterofyear
 @vectorize_1arg TimeType dayofquarter
 
-export dayofweek, isleap, daysinmonth, daysinyear, dayofyear, dayname, dayabbr,
+export dayofweek, isleapyear, daysinmonth, daysinyear, dayofyear, dayname, dayabbr,
         ismonday, istuesday, iswednesday, isthursday, isfriday, issaturday, issunday,
         dayofweekofmonth, daysofweekinmonth, monthname, monthabbr,
         quarterofyear, dayofquarter,
