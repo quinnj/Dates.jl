@@ -17,7 +17,10 @@ function unix2datetime(x)
 end
 # Returns unix seconds since 1970-01-01T00:00:00
 datetime2unix(dt::DateTime) = (value(dt) - UNIXEPOCH)/1000.0
-now() = unix2datetime(time())
+function now()
+    tm = TmStruct(time())
+    return DateTime(tm.year+1900,tm.month+1,tm.mday,tm.hour,tm.min,tm.sec)
+end
 today() = Date(now())
 
 rata2datetime(days) = DateTime(yearmonthday(days)...)
