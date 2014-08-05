@@ -194,7 +194,7 @@ Month of the year::
 
 As well as informationa about the ``TimeType``'s year and quarter::
 
-  julia> Dates.isleap(t)
+  julia> Dates.isleapyear(t)
   false
 
   julia> Dates.dayofyear(t)
