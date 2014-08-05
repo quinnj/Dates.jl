@@ -125,6 +125,8 @@ end
 (+)(x::CompoundPeriod,y::TimeType) = y + x
 
 # Convert fixed value Periods to # of milliseconds
+typealias FixedPeriod Union(Week,Day,Hour,Minute,Second,Millisecond)
+
 toms(c::Week)        = 604800000*value(c)
 toms(c::Day)         = 86400000*value(c)
 toms(c::Hour)        = 3600000*value(c)
@@ -132,9 +134,13 @@ toms(c::Minute)      = 60000*value(c)
 toms(c::Second)      = 1000*value(c)
 toms(c::Millisecond) = value(c)
 
+Millisecond{T<:FixedPeriod}(c::T) = Millisecond(toms(c))
+
 days(c::Millisecond) = div(value(c),86400000)
 days(c::Second) = div(value(c),86400)
 days(c::Minute) = div(value(c),1440)
 days(c::Hour) = div(value(c),24)
 days(c::Day) = value(c)
 days(c::Week) = 7*value(c)
+
+Day{T<:FixedPeriod}(c::T) = Day(days(c))
