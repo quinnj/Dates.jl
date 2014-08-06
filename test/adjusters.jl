@@ -296,11 +296,27 @@ dt = Dates.Date(2014,5,21)
 startdate = Dates.Date(2014,1,1)
 stopdate = Dates.Date(2014,2,1)
 @test length(Dates.recur(x->true,startdate:stopdate)) == 32
+@test length(Dates.recur(x->true,stopdate:Dates.Day(-1):startdate)) == 32
 
 januarymondays2014 = [Dates.Date(2014,1,6),Dates.Date(2014,1,13),Dates.Date(2014,1,20),Dates.Date(2014,1,27)]
 @test Dates.recur(Dates.ismonday,startdate,stopdate) == januarymondays2014
 @test Dates.recur(Dates.ismonday,startdate:stopdate) == januarymondays2014
 @test Dates.recur(x->!Dates.ismonday(x),startdate,stopdate;negate=true) == januarymondays2014
+
+@test_throws ArgumentError recur((x,y)->x+y,Dates.Date(2013):Dates.Date(2014))
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,2))) == 32
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,1))) == 1
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,2))) == 2
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,3))) == 3
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,4))) == 4
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,5))) == 5
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,6))) == 6
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,7))) == 7
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2013,1,8))) == 8
+@test length(recur(x->true,Dates.Date(2013):Dates.Month(1):Dates.Date(2013,1,1))) == 1
+@test length(recur(x->true,Dates.Date(2013):Dates.Day(-1):Dates.Date(2012,1,1))) == 367
+# Empty range
+@test length(recur(x->true,Dates.Date(2013):Dates.Date(2012,1,1))) == 0
 
 # All leap days in 20th century
 @test length(Dates.recur(Dates.Date(1900):Dates.Date(2000)) do x
@@ -406,6 +422,7 @@ observed = Dates.recur(OBSERVEDHOLIDAYS,Dates.Date(1999):Dates.Date(2000))
 # Get all business/working days of 2014
 # Since we have already defined observed holidays,
 # we just look at weekend days and use the "negate" keyword of recur
+# validate with http://www.workingdays.us/workingdays_holidays_2014.htm
 @test length(Dates.recur(Dates.Date(2014):Dates.Date(2015);negate=true) do x
     OBSERVEDHOLIDAYS(x) || 
     Dates.dayofweek(x) > 5
@@ -414,3 +431,15 @@ end) == 251
 # First day of the next month for each day of 2014
 @test length([Dates.firstdayofmonth(i+Dates.Month(1)) 
     for i in Dates.Date(2014):Dates.Date(2014,12,31)]) == 365
+
+# From those goofy email forwards claiming a "special, lucky month"
+# that has 5 Fridays, 5 Saturdays, and 5 Sundays and that it only
+# occurs every 823 years.....
+@test length(Dates.recur(Date(2000):Dates.Month(1):Date(2016)) do dt
+    sum = 0
+    for i = 1:7
+        sum += Dates.dayofweek(dt) > 4 ? Dates.daysofweekinmonth(dt) : 0
+        dt += Dates.Day(1)
+    end
+    return sum == 15
+end) == 15 # On average, there's one of those months every year

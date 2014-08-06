@@ -60,9 +60,13 @@ lastdayofquarter(dt::DateTime) = DateTime(lastdayofquarter(Date(dt)))
 immutable DateFunction
     f::Function
     # validate boolean, single-arg inner constructor
-    function DateFunction(f::Function,negate::Bool,dt::Dates.TimeType)
-        f(dt) in (true,false) || throw(ArgumentError("Provided function must take a single TimeType argument and return true or false"))
-        n = !negate ? identity : (!)
+    function DateFunction(f::Function,negate::Bool,dt::TimeType)
+        try
+            f(dt) in (true,false) || throw(ArgumentError("Provided function must take a single TimeType argument and return true or false"))
+        catch e
+            throw(ArgumentError("Provided function must take a single TimeType argument"))
+        end
+        n = negate ? (!) : identity
         return new(@eval x->$n($f(x)))
     end
 end
@@ -82,20 +86,11 @@ function adjust(func::Function,start;step::Period=Day(1),negate::Bool=false,limi
 end
 
 # Constructors using DateFunctions
-function Date(func::Function,y;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
-    return adjust(DateFunction(func,negate,Date(y)),Date(y),step,limit)
-end
-function Date(func::Function,y,m;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
-    return adjust(DateFunction(func,negate,Date(y,m)),Date(y,m),step,limit)
-end
-function Date(func::Function,y,m,d;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+function Date(func::Function,y,m=1,d=1;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
     return adjust(DateFunction(func,negate,Date(y,m,d)),Date(y,m,d),step,limit)
 end
 
-function DateTime(func::Function,y;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
-    return adjust(DateFunction(func,negate,DateTime(y)),DateTime(y),step,limit)
-end
-function DateTime(func::Function,y,m;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+function DateTime(func::Function,y,m=1;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
     return adjust(DateFunction(func,negate,DateTime(y,m)),DateTime(y,m),step,limit)
 end
 function DateTime(func::Function,y,m,d;step::Period=Hour(1),negate::Bool=false,limit::Int=10000)
@@ -145,14 +140,15 @@ function tolast(dt::TimeType,dow::Int;of::Union(Type{Year},Type{Month})=Month)
 end
 
 function recur{T<:TimeType}(fun::Function,start::T,stop::T;step::Period=Day(1),negate::Bool=false,limit::Int=10000)
+    ((start != stop) & ((step > zero(step)) != (stop > start))) && return T[]
     a = T[]
-    #sizehint(a,)?
-    df = DateFunction(fun,negate,start)
+    check = start <= stop ? 1 : -1
+    df = Dates.DateFunction(fun,negate,start)
     while true
         next = Dates.adjust(df,start,step,limit)
-        next > stop && break
+        cmp(next,stop) == check && break
         push!(a,next)
-        start = start == next ? start+step : next+step
+        start = next + step
     end
     return a
 end
