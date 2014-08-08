@@ -69,6 +69,7 @@ end
 
 # intfuncs
 Base.gcdx{T<:Period}(a::T,b::T) = ((g,x,y)=gcdx(Dates.value(a),Dates.value(b)); return T(g),x,y)
+Base.abs{T<:Period}(a::T) = T(abs(value(a)))
 
 periodisless(::Period,::Year)        = true
 periodisless(::Period,::Month)       = true
@@ -127,20 +128,24 @@ end
 # Convert fixed value Periods to # of milliseconds
 typealias FixedPeriod Union(Week,Day,Hour,Minute,Second,Millisecond)
 
-toms(c::Week)        = 604800000*value(c)
-toms(c::Day)         = 86400000*value(c)
-toms(c::Hour)        = 3600000*value(c)
-toms(c::Minute)      = 60000*value(c)
-toms(c::Second)      = 1000*value(c)
 toms(c::Millisecond) = value(c)
+toms(c::Second)      = 1000*value(c)
+toms(c::Minute)      = 60000*value(c)
+toms(c::Hour)        = 3600000*value(c)
+toms(c::Day)         = 86400000*value(c)
+toms(c::Week)        = 604800000*value(c)
+toms(c::Month)       = 86400000.0*30.436875*value(c)
+toms(c::Year)        = 86400000.0*365.2425*value(c)
 
 Millisecond{T<:FixedPeriod}(c::T) = Millisecond(toms(c))
 
 days(c::Millisecond) = div(value(c),86400000)
-days(c::Second) = div(value(c),86400)
-days(c::Minute) = div(value(c),1440)
-days(c::Hour) = div(value(c),24)
-days(c::Day) = value(c)
-days(c::Week) = 7*value(c)
+days(c::Second)      = div(value(c),86400)
+days(c::Minute)      = div(value(c),1440)
+days(c::Hour)        = div(value(c),24)
+days(c::Day)         = value(c)
+days(c::Week)        = 7*value(c)
+days(c::Year)        = 365.2425*value(c)
+days(c::Month)       = 30.436875*value(c)
 
 Day{T<:FixedPeriod}(c::T) = Day(days(c))
