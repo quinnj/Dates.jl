@@ -32,7 +32,7 @@ const MONTHTOVALUE = (UTF8String=>Dict{UTF8String,Int})["english"=>english]
 const MONTHTOVALUEABBR = (UTF8String=>Dict{UTF8String,Int})["english"=>abbrenglish]
 
 # Date/DateTime Parsing
-abstract Slot{P<:AbstractTime} <: AbstractTime
+abstract Slot{P<:AbstractTime}
 
 immutable DelimitedSlot{P<:AbstractTime} <: Slot{P}
     i::Int
@@ -131,7 +131,7 @@ function slotformat(slot::Slot{Month},dt)
         return VALUETOMONTH[slot.locale][month(dt)]
     end
 end
-slotformat(slot::Slot{Millisecond},dt) = millisecond(dt) == 0 ? ".0"^slot.width : string(millisecond(dt)/1000.0)[3:end]
+slotformat(slot::Slot{Millisecond},dt) = rpad(string(millisecond(dt)/1000.0)[3:end], slot.width, "0")
 
 function format(dt::TimeType,df::DateFormat)
     f = ""
@@ -156,7 +156,7 @@ format(dt::TimeType,f::String;locale::String="english") = format(dt,DateFormat(f
 
 # vectorized
 DateTime{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = DateTime(y,DateFormat(format,locale))
-function DateTime{T<:String}(y::AbstractArray{T},df::DateFormat=ISODateFormat)
+function DateTime{T<:String}(y::AbstractArray{T},df::DateFormat=ISODateTimeFormat)
     return reshape(DateTime[DateTime(parse(y[i],df)...) for i in 1:length(y)], size(y))
 end
 Date{T<:String}(y::AbstractArray{T},format::String;locale::String="english") = Date(y,DateFormat(format,locale))
@@ -171,5 +171,3 @@ end
 function format(y::AbstractArray{DateTime},df::DateFormat=ISODateTimeFormat)
     return reshape([Dates.format(y[i],df) for i in 1:length(y)], size(y))
 end
-
-export ISODateTimeFormat, ISODateFormat, DateFormat
