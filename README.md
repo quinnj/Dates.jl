@@ -1,5 +1,7 @@
 # Dates
 
+## Note the functionality of this package has been merged into the Base Standard Library. This package exists to allow 0.3 compatibility for dependent packages.
+
 [![Build Status](https://travis-ci.org/quinnj/Dates.jl.png)](https://travis-ci.org/quinnj/Dates.jl)
 [![Coverage Status](https://img.shields.io/coveralls/quinnj/Dates.jl.svg)](https://coveralls.io/r/quinnj/Dates.jl)
 
@@ -16,4 +18,4 @@ julia> using Dates # Loads Dates code into current julia session
 ```
 
 
-* Checkout the work-in-progress [Dates manual](https://github.com/quinnj/Dates.jl/blob/master/docs/docs.rst)
+Documentation can be found as a [chapter in the Julia manual](http://docs.julialang.org/en/latest/manual/dates/) as well as the [API reference](http://docs.julialang.org/en/latest/stdlib/dates/).
