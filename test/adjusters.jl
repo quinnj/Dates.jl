@@ -391,7 +391,7 @@ function easter(y)
 end
 iseaster(dt) = Dates.yearmonthday(dt) == easter(Dates.year(dt))
 
-const HOLIDAYS = x->isnewyears(x) || isindependenceday(x) ||
+HOLIDAYS = x->isnewyears(x) || isindependenceday(x) ||
                     isveteransday(x) || ischristmas(x) ||
                     ismartinlutherking(x) || ispresidentsday(x) ||
                     ismemorialday(x) || islaborday(x) ||
@@ -399,7 +399,7 @@ const HOLIDAYS = x->isnewyears(x) || isindependenceday(x) ||
 
 @test length(Dates.recur(HOLIDAYS,dr)) == 11
 
-const OBSERVEDHOLIDAYS = x->begin
+OBSERVEDHOLIDAYS = x->begin
     # If the holiday is on a weekday
     if HOLIDAYS(x) && Dates.dayofweek(x) < Dates.Saturday
         return true

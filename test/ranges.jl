@@ -271,7 +271,8 @@ end)
 a = Dates.DateTime(2013,1,1)
 b = Dates.DateTime(2013,2,1)
 @test map!(x->x+Dates.Day(1),Array(Dates.DateTime,32),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
-@test map(x->x+Dates.Day(1),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
+if WORD_SIZE == 64
+    @test map(x->x+Dates.Day(1),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]end
 
 @test map(x->a in x,drs[1:4]) == [true,true,false,true]
 @test a in dr
@@ -349,7 +350,9 @@ end)
 a = Dates.Date(2013,1,1)
 b = Dates.Date(2013,2,1)
 @test map!(x->x+Dates.Day(1),Array(Dates.Date,32),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
-@test map(x->x+Dates.Day(1),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
+if WORD_SIZE == 64
+    @test map(x->x+Dates.Day(1),dr) == [(a+Dates.Day(1)):(b+Dates.Day(1))]
+end    
 
 @test map(x->a in x,drs[1:4]) == [true,true,false,true]
 @test a in dr
