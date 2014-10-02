@@ -21,8 +21,8 @@ function now()
     tm = TmStruct(time())
     return DateTime(tm.year+1900,tm.month+1,tm.mday,tm.hour,tm.min,tm.sec)
 end
+now(::Type{UTC}) = unix2datetime(time())
 today() = Date(now())
-nowutc() = unix2datetime(time())
 
 rata2datetime(days) = DateTime(yearmonthday(days)...)
 datetime2rata(dt::DateTime) = days(dt)
