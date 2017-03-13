@@ -18,5 +18,5 @@ julia> using Dates # Loads Dates code into current julia session
 ```
 
 
-Documentation can be found as a [chapter in the Julia manual](http://docs.julialang.org/en/latest/manual/dates/) as well as the [API reference](http://docs.julialang.org/en/latest/stdlib/dates/).
+Documentation can be found as a [chapter in the Julia manual](http://docs.julialang.org/en/stable/stdlib/dates/) as well as the [API reference](http://docs.julialang.org/en/latest/stdlib/dates.html#Dates-and-Time-1).
 
