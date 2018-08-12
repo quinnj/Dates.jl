@@ -75,6 +75,8 @@ end
 (.+){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .+ y
 (.-){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .- y
 
-# Propogatinc missings 
+# Propogate missings 
 +(t::TimeType, m::Missing) = missing
++(m::Missing, t::TimeType) = missing
 -(t::TimeType, m::Missing) = missing
+-(m::Missing, t::TimeType) = missing
