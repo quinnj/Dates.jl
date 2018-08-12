@@ -74,3 +74,7 @@ end
 (.-){T<:TimeType}(x::AbstractArray{T}, y::Period) = reshape(T[i - y for i in x], size(x))
 (.+){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .+ y
 (.-){T<:TimeType}(y::Period, x::AbstractArray{T}) = x .- y
+
+# Propogatinc missings 
++(t::TimeType, m::Missing) = missing
+-(t::TimeType, m::Missing) = missing
